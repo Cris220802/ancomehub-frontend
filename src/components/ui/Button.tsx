@@ -9,12 +9,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        // DEFAULT: Color DORADO (Primary) con texto OSCURO (Primary-Foreground)
-        // Agregamos sombra y efecto hover para que resalte
         default:
           "bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg active:scale-[0.98]",
-
-        // DESTRUCTIVE: Rojo para borrar cosas
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
 
