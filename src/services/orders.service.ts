@@ -8,6 +8,8 @@ import {
     OrderPreviewResponse,
     OrderStatus,
     PaginatedOrdersResponse,
+    PaginatedQuotesResponse,
+    QuoteFilters,
     RegisterShipmentDto,
     responseFulfillBackordersDto,
     UpdateOrderStatusDto,
@@ -15,15 +17,15 @@ import {
 
 export const OrdersService = {
     // Orders
-    createOrder: async (data: CreateOrderDto): Promise<OrderDetail> => {
-        const response = await api.post<OrderDetail>('/orders', data);
-        return response.data;
-    },
+    // createOrder: async (data: CreateOrderDto): Promise<OrderDetail> => {
+    //     const response = await api.post<OrderDetail>('/orders', data);
+    //     return response.data;
+    // },
 
-    createPreviewOrder: async (data: CreateOrderDto): Promise<OrderPreviewResponse> => {
-        const response = await api.post<OrderPreviewResponse>('/orders/preview', data);
-        return response.data;
-    },
+    // createPreviewOrder: async (data: CreateOrderDto): Promise<OrderPreviewResponse> => {
+    //     const response = await api.post<OrderPreviewResponse>('/orders/preview', data);
+    //     return response.data;
+    // },
 
 
 
@@ -76,6 +78,10 @@ export const OrdersService = {
         return response.data;
     },
 
+    findQuotesByClient: async (id: string, filters?: QuoteFilters): Promise<PaginatedQuotesResponse> => {
+        const response = await api.get<PaginatedQuotesResponse>(`/orders/client/${id}/quotes`, { params: filters });
+        return response.data;
+    },
     // Quotes
     createQuote: async (data: CreateQuoteDto): Promise<OrderDetail> => {
         const response = await api.post<OrderDetail>('/orders/quote', data);
@@ -83,7 +89,23 @@ export const OrdersService = {
     },
 
     convertQuoteToOrder: async (data: CreateOrderDto, id: string): Promise<OrderDetail> => {
-        const response = await api.post<OrderDetail>(`/orders/quotes/${id}/convert`, data);
+        const formData = new FormData();
+        Object.keys(data).forEach((key) => {
+            const value = (data as any)[key];
+            if (value !== undefined && value !== null) {
+                if (typeof value === 'object' && !(value instanceof File)) {
+                    formData.append(key, JSON.stringify(value));
+                } else {
+                    formData.append(key, value);
+                }
+            }
+        });
+
+        const response = await api.post<OrderDetail>(`/orders/quotes/${id}/convert`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     },
 

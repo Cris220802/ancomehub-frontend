@@ -53,7 +53,7 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
                         <span className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
                             SKU: {product.sku}
                         </span>
-                        {product.stock > 0 ? (
+                        {product.availableStock ? (
                             <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700 hover:bg-green-100">
                                 <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                 Entrega Inmediata
@@ -73,14 +73,14 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
                 </div>
 
                 {/* Price */}
-                <div className="border-t border-b border-gray-100 py-4">
+                {/* <div className="border-t border-b border-gray-100 py-4">
                     <div className="flex items-baseline gap-2">
                         <span className="text-3xl font-bold text-primary">
                             {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(product.basePrice)}
                         </span>
                         <span className="text-sm text-gray-500 font-normal">MXN + IVA</span>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Description */}
                 <div className="prose prose-sm text-gray-600">

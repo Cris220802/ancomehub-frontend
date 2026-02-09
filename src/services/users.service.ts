@@ -13,6 +13,7 @@ import {
     InviteUserDto,
     PaginatedAgentsResponseDto,
     PaginatedClientsResponseDto,
+    updateClientDataDto,
     UpdateClientProfileDto,
     UpdateUserDto,
 } from '../types/users';
@@ -95,5 +96,9 @@ export const UsersService = {
 
     updateClientProfile: async (id: string, dto: UpdateClientProfileDto): Promise<void> => {
         await api.patch(`/users/clients/${id}`, dto);
+    },
+
+    updateClientData: async (id: string, dto: updateClientDataDto): Promise<void> => {
+        await api.patch(`/users/clients/update-data/${id}`, dto);
     },
 };

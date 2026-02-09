@@ -8,12 +8,14 @@ import { Eye, FileText } from "lucide-react"
 const statusColors: Record<string, string> = {
     PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     CONFIRMED: 'bg-blue-100 text-blue-800 border-blue-200',
+    CONVERTED: 'bg-green-100 text-green-800 border-green-200',
     // Add other quote statuses if different
 };
 
 const statusLabels: Record<string, string> = {
     PENDING: 'Borrador',
     CONFIRMED: 'Aprobada',
+    CONVERTED: 'Convertido',
     // Add others
 };
 

@@ -20,9 +20,9 @@ export const CartSheet = () => {
     const {
         cart,
         totalItems,
-        subtotal,
-        tax,
-        total,
+        // subtotal,
+        // tax,
+        // total,
         removeFromCart,
         setQuantity,
         isLoading
@@ -103,11 +103,11 @@ export const CartSheet = () => {
                                                     <Plus className="h-3 w-3" />
                                                 </button>
                                             </div>
-                                            <div className="text-right">
+                                            {/* <div className="text-right">
                                                 <p className="font-semibold text-sm">
                                                     {new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(item.unitPrice * item.quantity)}
                                                 </p>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
 
@@ -129,7 +129,7 @@ export const CartSheet = () => {
                 {cart && cart.items.length > 0 && (
                     <div className="border-t bg-gray-50/50 p-6 space-y-4">
                         <div className="space-y-1.5 text-sm">
-                            <div className="flex justify-between text-gray-500">
+                            {/* <div className="flex justify-between text-gray-500">
                                 <span>Subtotal</span>
                                 <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(subtotal)}</span>
                             </div>
@@ -141,7 +141,7 @@ export const CartSheet = () => {
                             <div className="flex justify-between font-bold text-lg text-gray-900">
                                 <span>Total</span>
                                 <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(total)}</span>
-                            </div>
+                            </div> */}
                         </div>
 
                         <SheetFooter>

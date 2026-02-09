@@ -36,8 +36,11 @@ import { FiscalDetailPage } from '@/pages/client/fiscal/FiscalDetailPage';
 import { PaymentDetailPage } from '@/pages/client/payments/PaymentDetailPage';
 import { OrdersPage as AdminOrdersPage } from '@/pages/admin/orders/OrdersPage';
 import { OrderDetailPage as AdminOrderDetailPage } from '@/pages/admin/orders/OrderDetailPage';
+import { QuoteAdminDetailPage } from '@/pages/admin/orders/QuoteAdminDetailPage';
 import { FiscalAdminPage } from '@/pages/admin/fiscal/FiscalAdminPage';
 import { FiscalAdminDetailPage } from '@/pages/admin/fiscal/FiscalAdminDetailPage';
+import PriceListsPage from '@/pages/admin/pricing/PriceListsPage';
+import PriceListDetailPage from '@/pages/admin/pricing/PriceListDetailPage';
 import { WarehousePage } from '@/pages/admin/warehouse/WarehousePage';
 import { MovementProductDetailPage } from '@/pages/admin/warehouse/MovementProductDetailPage';
 import ClientsPage from '@/pages/admin/users/clients/ClientsPage';
@@ -47,6 +50,7 @@ import AgentDetailPage from '@/pages/admin/users/agents/AgentDetailPage';
 import { ProfilePage } from '@/pages/client/profile/ProfilePage';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { CatalogPage as PublicCatalogPage } from '@/pages/public/CatalogPage';
+import { NotificationsMenu } from '@/components/layout/NotificationsMenu';
 
 const MainLayout = () => {
     const { logout, user } = useAuthStore();
@@ -65,7 +69,7 @@ const MainLayout = () => {
                 </div>
 
                 <nav className="flex-1 p-4 space-y-2">
-                    <NavLink
+                    {/* <NavLink
                         to="/"
                         end
                         className={({ isActive }) =>
@@ -77,7 +81,7 @@ const MainLayout = () => {
                     >
                         <LayoutDashboard className="h-5 w-5" />
                         Dashboard
-                    </NavLink>
+                    </NavLink> */}
                     <NavLink
                         to="/admin/clients"
                         className={({ isActive }) =>
@@ -125,6 +129,18 @@ const MainLayout = () => {
                     >
                         <DockIcon className="h-5 w-5" />
                         Facturas
+                    </NavLink>
+                    <NavLink
+                        to="/admin/pricing"
+                        className={({ isActive }) =>
+                            `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                                ? 'bg-primary/10 text-primary font-medium'
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                            }`
+                        }
+                    >
+                        <Tags className="h-5 w-5" />
+                        Listas de precios
                     </NavLink>
                     <NavLink
                         to="/admin/warehouse"
@@ -176,10 +192,35 @@ const MainLayout = () => {
                 </div>
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                <Outlet />
-            </main>
+            <div className="flex-1 flex flex-col">
+
+                {/* TOPBAR NUEVA */}
+                <header className="h-16 bg-white border-b shadow-sm sticky top-0 z-30 px-8 flex items-center justify-end">
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-500 hidden md:block">
+                            Modo Administrador
+                        </span>
+
+                        {/* El componente de notificaciones que pediste */}
+                        <NotificationsMenu />
+
+                        <div className="h-8 w-[1px] bg-gray-200 mx-2"></div>
+
+                        <div className="flex items-center gap-2">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-xs font-bold text-gray-900 leading-none capitalize">{user?.role}</p>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                {/* Main Content */}
+                <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+                    <Outlet />
+                </main>
+            </div>
+
+
         </div>
     );
 };
@@ -232,8 +273,11 @@ export const AppRouter = () => {
                                 <Route path="admin/categories" element={<CategoriesPage />} />
                                 <Route path="admin/orders" element={<AdminOrdersPage />} />
                                 <Route path="admin/orders/:id" element={<AdminOrderDetailPage />} />
+                                <Route path="admin/orders/quotes/:id" element={<QuoteAdminDetailPage />} />
                                 <Route path="admin/fiscal" element={<FiscalAdminPage />} />
                                 <Route path="admin/fiscal/:id" element={<FiscalAdminDetailPage />} />
+                                <Route path="admin/pricing" element={<PriceListsPage />} />
+                                <Route path="admin/pricing/:id" element={<PriceListDetailPage />} />
                                 <Route path="admin/warehouse" element={<WarehousePage />} />
                                 <Route path="admin/warehouses/:warehouseId/products/:productId" element={<MovementProductDetailPage />} />
                             </Route>
@@ -255,9 +299,19 @@ export const AppRouter = () => {
                             <Route path="payments/:id" element={<PaymentDetailPage />} />
                             <Route path="client/profile" element={<ProfilePage />} />
                             {/* Prevent clients from accessing admin routes */}
-                            <Route path="users" element={<Navigate to="/unauthorized" replace />} />
-                            <Route path="products" element={<Navigate to="/unauthorized" replace />} />
-                            <Route path="categories" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/clients" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/clients/:id" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/agents" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/agents/:id" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/products" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/categories" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/orders" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/orders/:id" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/orders/quotes/:id" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/fiscal" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/fiscal/:id" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/warehouse" element={<Navigate to="/unauthorized" replace />} />
+                            <Route path="admin/warehouses/:warehouseId/products/:productId" element={<Navigate to="/unauthorized" replace />} />
                         </Route>
                     )}
 

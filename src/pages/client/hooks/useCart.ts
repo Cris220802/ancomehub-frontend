@@ -75,9 +75,9 @@ export const useCart = () => {
 
     // Helper to calculate totals
     const cart = cartQuery.data;
-    const subtotal = cart?.items.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0) || 0;
-    const tax = subtotal * 0.16;
-    const total = subtotal + tax;
+    // const subtotal = cart?.items.reduce((acc, item) => acc + (item.unitPrice * item.quantity), 0) || 0;
+    // const tax = subtotal * 0.16;
+    // const total = subtotal + tax;
     const totalItems = cart?.items.reduce((acc, item) => acc + item.quantity, 0) || 0;
 
     // Logic wrapper for Delta updates
@@ -93,9 +93,9 @@ export const useCart = () => {
         cart,
         isLoading: cartQuery.isLoading,
         isError: cartQuery.isError,
-        subtotal,
-        tax,
-        total,
+        // subtotal,
+        // tax,
+        // total,
         totalItems,
         addToCart: addToCartMutation.mutate,
         removeFromCart: removeFromCartMutation.mutate,

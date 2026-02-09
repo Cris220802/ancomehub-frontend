@@ -36,7 +36,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from 'sonner';
-import { OrderPaymentStatus, OrderStatus } from '@/types/orders';
+import { OrderPaymentStatus, OrderStatus, PaymentMethod } from '@/types/orders';
 import { getImageUrl, cn } from '@/lib/utils';
 import { usePayments } from '@/pages/client/hooks/usePayments';
 import { PaymentDialog } from '@/pages/client/payments/components/PaymentDialog';
@@ -67,6 +67,12 @@ const statusConfig: Record<OrderStatus, { label: string; color: string; icon: Re
         color: 'bg-green-100 text-green-800 border-green-200',
         icon: <Package className="h-4 w-4" />,
         description: 'El pedido ha sido entregado exitosamente.'
+    },
+    CONVERTED: {
+        label: 'Convertido',
+        color: 'bg-blue-100 text-blue-800 border-blue-200',
+        icon: <FileText className="h-4 w-4" />,
+        description: 'El pedido ha sido convertido.'
     },
     CANCELLED: {
         label: 'Cancelado',
@@ -104,14 +110,16 @@ const paymentStatusConfig: Record<OrderPaymentStatus, { label: string; color: st
         color: 'bg-green-100 text-green-800 border-green-200',
         icon: <Package className="h-4 w-4" />
     },
+    CANCELLED: {
+        label: 'Cancelado',
+        color: 'bg-red-100 text-red-800 border-red-200',
+        icon: <AlertOctagon className="h-4 w-4" />
+    },
 };
 
-const paymentMethodLabels: Record<PaymentMethodPayment, string> = {
-    CASH: 'Efectivo',
-    TRANSFER: 'Transferencia Bancaria',
-    CREDIT: 'Crédito Ancome',
-    CHECK: 'Cheque',
-    DEPOSIT: 'Depósito',
+const paymentMethodLabels: Record<PaymentMethod, string> = {
+    CASH_PAYMENT: 'Efectivo',
+    CREDIT_PAYMENT: 'Crédito Ancome'
 };
 
 export const OrderDetailPage = () => {
@@ -119,7 +127,6 @@ export const OrderDetailPage = () => {
     const navigate = useNavigate();
     const { useOrderDetail, cancelOrder, isCancellingOrder } = useOrders(); // Updated hook usage
     const { data: order, isLoading, isError } = useOrderDetail(id || '');
-
     // Payments Logic
     const { useOrderPayments } = usePayments();
     const { data: payments } = useOrderPayments(id || '');
@@ -185,6 +192,20 @@ export const OrderDetailPage = () => {
     const hasInvoice = (order.fiscalDocuments?.length ?? 0) > 0;
     // Asumimos que el ID de la factura es el del primer documento si existe
     const invoiceId = hasInvoice ? order.fiscalDocuments![0].id : null;
+
+    // Parse shippingInfo safely
+    const shippingInfo = React.useMemo(() => {
+        if (!order?.shippingInfo) return null;
+        if (typeof order.shippingInfo === 'string') {
+            try {
+                return JSON.parse(order.shippingInfo);
+            } catch (e) {
+                console.error("Error parsing shippingInfo:", e);
+                return null;
+            }
+        }
+        return order.shippingInfo;
+    }, [order?.shippingInfo]);
 
     return (
         <div className="min-h-screen bg-gray-50/50 pb-12 animate-in fade-in duration-500">
@@ -301,10 +322,10 @@ export const OrderDetailPage = () => {
                                 <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                     <MapPin className="h-4 w-4 text-primary" /> Dirección de Envío
                                 </h3>
-                                {order.shippingInfo && Object.keys(order.shippingInfo).length > 0 ? (
+                                {shippingInfo && Object.keys(shippingInfo).length > 0 ? (
                                     <div className="text-sm text-gray-600 space-y-1">
-                                        <p className="font-medium text-gray-900">{order.shippingInfo.street + ' ' + order.shippingInfo.exteriorNumber + ' ' + order.shippingInfo.interiorNumber}</p>
-                                        <p>{order.shippingInfo.neighborhood}, {order.shippingInfo.zipCode}, {order.shippingInfo.city}, {order.shippingInfo.state}</p>
+                                        <p className="font-medium text-gray-900">{shippingInfo.street + ' ' + shippingInfo.exteriorNumber + ' ' + (shippingInfo.interiorNumber || '')}</p>
+                                        <p>{shippingInfo.neighborhood}, {shippingInfo.zipCode}, {shippingInfo.city}, {shippingInfo.state}</p>
                                     </div>
                                 ) : (
                                     <div className="bg-gray-50 rounded-lg p-4 text-center border border-dashed border-gray-300">
@@ -324,8 +345,8 @@ export const OrderDetailPage = () => {
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Estatus</p>
-                                        <Badge variant="outline" className={cn("", paymentStatusConfig[order.paymentStatus].color)}>
-                                            {paymentStatusConfig[order.paymentStatus].icon} {paymentStatusConfig[order.paymentStatus].label}
+                                        <Badge variant="outline" className={cn("", paymentStatusConfig[order.paymentStatus]?.color ?? "")}>
+                                            {paymentStatusConfig[order.paymentStatus]?.icon} {paymentStatusConfig[order.paymentStatus]?.label}
                                         </Badge>
                                     </div>
                                 </div>

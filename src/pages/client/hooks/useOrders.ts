@@ -37,44 +37,44 @@ export const useOrders = () => {
     const [showIncompleteProfileDialog, setShowIncompleteProfileDialog] = useState(false);
 
     // --- Mutations ---
-    const createOrderMutation = useMutation({
-        mutationFn: OrdersService.createOrder,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['orders'] });
-            queryClient.invalidateQueries({ queryKey: ['cart'] });
-            CartService.clearCart().then(() => {
-                queryClient.invalidateQueries({ queryKey: ['cart'] });
-            });
+    // const createOrderMutation = useMutation({
+    //     mutationFn: OrdersService.createOrder,
+    //     onSuccess: () => {
+    //         queryClient.invalidateQueries({ queryKey: ['orders'] });
+    //         queryClient.invalidateQueries({ queryKey: ['cart'] });
+    //         CartService.clearCart().then(() => {
+    //             queryClient.invalidateQueries({ queryKey: ['cart'] });
+    //         });
 
-            toast.success("Pedido creado exitosamente");
-            navigate('/orders');
-        },
-        onError: (error: any) => {
-            // Check for specific error message or code
-            // Backend throws: BadRequestException('User information is not completed')
-            // Which usually comes as 400 Bad Request with message "User information is not completed"
-            if (error.response?.data?.message === 'User information is not completed') {
-                setShowIncompleteProfileDialog(true);
-            } else {
-                toast.error("Error al crear el pedido: " + (error.response?.data?.message || "Error desconocido"));
-            }
-        }
-    });
+    //         toast.success("Pedido creado exitosamente");
+    //         navigate('/orders');
+    //     },
+    //     onError: (error: any) => {
+    //         // Check for specific error message or code
+    //         // Backend throws: BadRequestException('User information is not completed')
+    //         // Which usually comes as 400 Bad Request with message "User information is not completed"
+    //         if (error.response?.data?.message === 'User information is not completed') {
+    //             setShowIncompleteProfileDialog(true);
+    //         } else {
+    //             toast.error("Error al crear el pedido: " + (error.response?.data?.message || "Error desconocido"));
+    //         }
+    //     }
+    // });
 
-    const createPreviewOrderMutation = useMutation({
-        mutationFn: OrdersService.createPreviewOrder,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['orders'] });
-            queryClient.invalidateQueries({ queryKey: ['cart'] });
-        },
-        onError: (error: any) => {
-            if (error.response?.data?.message === 'User information is not completed') {
-                setShowIncompleteProfileDialog(true);
-            } else {
-                toast.error("Error al crear el pedido: " + (error.response?.data?.message || "Error desconocido"));
-            }
-        }
-    });
+    // const createPreviewOrderMutation = useMutation({
+    //     mutationFn: OrdersService.createPreviewOrder,
+    //     onSuccess: () => {
+    //         queryClient.invalidateQueries({ queryKey: ['orders'] });
+    //         queryClient.invalidateQueries({ queryKey: ['cart'] });
+    //     },
+    //     onError: (error: any) => {
+    //         if (error.response?.data?.message === 'User information is not completed') {
+    //             setShowIncompleteProfileDialog(true);
+    //         } else {
+    //             toast.error("Error al crear el pedido: " + (error.response?.data?.message || "Error desconocido"));
+    //         }
+    //     }
+    // });
 
     const createQuoteMutation = useMutation({
         mutationFn: OrdersService.createQuote,
@@ -113,7 +113,15 @@ export const useOrders = () => {
             navigate(`/orders/${order.id}`);
         },
         onError: (error: any) => {
-            toast.error("Error al convertir cotización: " + (error.response?.data?.message || "Error desconocido"));
+            if (error.response?.data?.message === 'Order purchase document is required') {
+                return;
+            } else if (error.response?.data?.message === 'You are not authorized to convert this quote') {
+                return;
+            } else if (error.response?.data?.message === 'User credit is disabled') {
+                return;
+            } else {
+                toast.error("Error al convertir cotización: " + (error.response?.data?.message || "Error desconocido"));
+            }
         }
     });
 
@@ -139,10 +147,10 @@ export const useOrders = () => {
         useQuotesList,
         useOrderDetail,
         useQuoteDetail,
-        createOrder: createOrderMutation.mutateAsync,
-        createOrderPreview: createPreviewOrderMutation.mutateAsync,
-        isCreatingOrderPreview: createPreviewOrderMutation.isPending,
-        isCreatingOrder: createOrderMutation.isPending,
+        // createOrder: createOrderMutation.mutateAsync,
+        // createOrderPreview: createPreviewOrderMutation.mutateAsync,
+        // isCreatingOrderPreview: createPreviewOrderMutation.isPending,
+        // isCreatingOrder: createOrderMutation.isPending,
         createQuote: createQuoteMutation.mutateAsync,
         isCreatingQuote: createQuoteMutation.isPending,
         downloadQuotePdf: downloadQuotePdfMutation.mutateAsync,

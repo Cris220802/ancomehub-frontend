@@ -36,22 +36,22 @@ export function ProductFiltersSidebar({
     const { categories } = useCategories();
 
     // Local state for immediate UI updates (debounce actual filter change)
-    const [priceRange, setPriceRange] = useState<[number, number]>([
-        filters.minPrice || 0,
-        filters.maxPrice || 10000,
-    ]);
+    // const [priceRange, setPriceRange] = useState<[number, number]>([
+    //     filters.minPrice || 0,
+    //     filters.maxPrice || 10000,
+    // ]);
 
-    const debouncedPriceRange = useDebounce(priceRange, 1000);
+    // const debouncedPriceRange = useDebounce(priceRange, 1000);
 
     // Sync debounce with parent filters
     useEffect(() => {
         setFilters({
             ...filters,
-            minPrice: debouncedPriceRange[0],
-            maxPrice: debouncedPriceRange[1],
+            // minPrice: debouncedPriceRange[0],
+            // maxPrice: debouncedPriceRange[1],
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [debouncedPriceRange]);
+    }, []);
 
     const handleCategoryChange = (categoryId: string | undefined) => {
         setFilters({ ...filters, categoryId });
@@ -62,13 +62,13 @@ export function ProductFiltersSidebar({
     };
 
     const clearFilters = () => {
-        setPriceRange([0, 10000]);
+        // setPriceRange([0, 10000]);
         setFilters({
             limit: filters.limit,
             page: 1,
             categoryId: undefined,
-            minPrice: undefined,
-            maxPrice: undefined,
+            // minPrice: undefined,
+            // maxPrice: undefined,
             immediateDelivery: undefined,
         });
     };
@@ -114,7 +114,7 @@ export function ProductFiltersSidebar({
                 </AccordionItem>
 
                 {/* Price Section */}
-                <AccordionItem value="price">
+                {/* <AccordionItem value="price">
                     <AccordionTrigger>Precio</AccordionTrigger>
                     <AccordionContent>
                         <div className="space-y-4 pt-2">
@@ -145,7 +145,7 @@ export function ProductFiltersSidebar({
                             </div>
                         </div>
                     </AccordionContent>
-                </AccordionItem>
+                </AccordionItem> */}
 
                 {/* Availability Section */}
                 <AccordionItem value="availability">

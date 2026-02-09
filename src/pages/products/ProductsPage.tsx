@@ -34,7 +34,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/Input"
-import { CreateProductDto, Product } from "../../types/products"
+import { CreateProductDto, Product, ProductAdmin, UpdateProductDto } from "../../types/products"
 import { CustomPagination } from "@/components/common/CustomPagination"
 
 export const ProductsPage = () => {
@@ -57,8 +57,8 @@ export const ProductsPage = () => {
 
     // State management
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-    const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+    const [editingProduct, setEditingProduct] = useState<ProductAdmin | null>(null);
+    const [deleteProduct, setDeleteProduct] = useState<ProductAdmin | null>(null);
 
     // Debounce for Product Name input
     const [productNameInput, setProductNameInput] = useState(filters.productName || '');
@@ -81,7 +81,7 @@ export const ProductsPage = () => {
         }
     };
 
-    const handleUpdate = async (data: CreateProductDto) => {
+    const handleUpdate = async (data: UpdateProductDto) => {
         if (!editingProduct) return;
         try {
             await updateMutation.mutateAsync({ id: editingProduct.id, data });
@@ -106,7 +106,7 @@ export const ProductsPage = () => {
         }
     };
 
-    const handleToggleStatus = async (product: Product) => {
+    const handleToggleStatus = async (product: ProductAdmin) => {
         const action = product.isActive ? 'desactivate' : 'activate';
         try {
             await toggleStatusMutation.mutateAsync({ id: product.id, action });
@@ -122,7 +122,7 @@ export const ProductsPage = () => {
         setIsDialogOpen(true);
     };
 
-    const openEditDialog = (product: Product) => {
+    const openEditDialog = (product: ProductAdmin) => {
         setEditingProduct(product);
         setIsDialogOpen(true);
     };
@@ -212,7 +212,7 @@ export const ProductsPage = () => {
                 </div>
             </div>
 
-            <DataTable columns={columns} data={products} />
+            <DataTable columns={columns} data={products as ProductAdmin[]} />
 
             <CustomPagination
                 meta={meta}
@@ -235,7 +235,13 @@ export const ProductsPage = () => {
 
                     <ProductForm
                         defaultValues={editingProduct || undefined}
-                        onSubmit={editingProduct ? handleUpdate : handleCreate}
+                        onSubmit={(data) => {
+                            if (editingProduct) {
+                                handleUpdate(data as UpdateProductDto);
+                            } else {
+                                handleCreate(data as CreateProductDto);
+                            }
+                        }}
                         isSubmitting={isSubmitting}
                         onCancel={() => setIsDialogOpen(false)}
                     />

@@ -10,8 +10,8 @@ export interface UpdateCartItemDto {
 export interface CartItem {
     id: string;
     quantity: number;
-    unitPrice: number;
-    priceListId: string | null;
+    // unitPrice: number;
+    // priceListId: string | null;
     product: {
         id: string;
         sku: string;

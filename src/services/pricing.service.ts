@@ -2,8 +2,12 @@ import api from '../api/axios';
 import {
     AssignPriceListDto,
     CreatePriceListDto,
+    FilterPriceListDto,
+    PaginatedPriceListResponse,
     PriceList,
+    PriceListDetail,
     PriceListItem,
+    UnassignPriceListDto,
     UpdatePriceListDto,
     UpsertPriceListItemDto,
 } from '../types/pricing';
@@ -15,18 +19,18 @@ export const PricingService = {
         return response.data;
     },
 
-    findAllLists: async (params?: { limit?: number; offset?: number }): Promise<PriceList[]> => {
-        const response = await api.get<PriceList[]>('/pricing/lists', { params });
+    findOneList: async (id: string): Promise<PriceListDetail> => {
+        const response = await api.get<PriceListDetail>(`/pricing/lists/${id}`);
         return response.data;
     },
 
-    findOneList: async (id: string): Promise<PriceList> => {
-        const response = await api.get<PriceList>(`/pricing/lists/${id}`);
+    findAllLists: async (params?: FilterPriceListDto): Promise<PaginatedPriceListResponse> => {
+        const response = await api.get<PaginatedPriceListResponse>('/pricing/lists', { params });
         return response.data;
     },
 
-    updateList: async (id: string, data: UpdatePriceListDto): Promise<PriceList> => {
-        const response = await api.patch<PriceList>(`/pricing/lists/${id}`, data);
+    updateList: async (id: string, data: UpdatePriceListDto): Promise<PriceListDetail> => {
+        const response = await api.patch<PriceListDetail>(`/pricing/lists/${id}`, data);
         return response.data;
     },
 
@@ -62,5 +66,9 @@ export const PricingService = {
 
     assignToClients: async (data: AssignPriceListDto): Promise<void> => {
         await api.post('/pricing/assign', data);
+    },
+
+    unassignFromClients: async (data: UnassignPriceListDto): Promise<void> => {
+        await api.delete(`/pricing/unassign/${data.userId}`);
     },
 };

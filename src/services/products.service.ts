@@ -1,14 +1,15 @@
 import api from '../api/axios';
-import { CatalogFilters, CreateProductDto, FilterProductDto, PaginatedCatalogResponse, Product, ProductDetailCatalogResponse, ProductResponse, UpdateProductDto } from '../types/products';
+import { CatalogFilters, CreateProductDto, FilterProductDto, PaginatedCatalogResponse, Product, ProductAdmin, ProductDetailCatalogResponse, ProductResponse, ProductResponseAdmin, UpdateProductDto } from '../types/products';
 
 export const ProductsService = {
-    findAllAdmin: async (params?: FilterProductDto): Promise<ProductResponse> => {
-        const response = await api.get('/products/admin', { params });
+    findAllAdmin: async (params?: FilterProductDto): Promise<ProductResponseAdmin> => {
+        const response = await api.get<ProductResponseAdmin>('/products/admin', { params });
         return response.data;
     },
 
     findAllClient: async (params?: FilterProductDto): Promise<ProductResponse> => {
         const response = await api.get('/products/client', { params });
+        console.log(response)
         return response.data;
     },
 
@@ -24,6 +25,11 @@ export const ProductsService = {
 
     findOne: async (id: string): Promise<Product> => {
         const response = await api.get<Product>(`/products/${id}`);
+        return response.data;
+    },
+
+    findOneAdmin: async (id: string): Promise<ProductAdmin> => {
+        const response = await api.get<ProductAdmin>(`/products/admin/${id}`);
         return response.data;
     },
 

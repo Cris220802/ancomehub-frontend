@@ -10,6 +10,7 @@ const statusColors: Record<OrderStatus, string> = {
     CONFIRMED: 'bg-blue-100 text-blue-800 border-blue-200',
     PARTIALLY_DELIVERED: 'bg-orange-100 text-orange-800 border-orange-200',
     COMPLETED: 'bg-green-100 text-green-800 border-green-200',
+    CONVERTED: 'bg-blue-100 text-blue-800 border-blue-200',
     CANCELLED: 'bg-red-100 text-red-800 border-red-200',
 };
 
@@ -18,6 +19,7 @@ const statusLabels: Record<OrderStatus, string> = {
     CONFIRMED: 'Confirmado',
     PARTIALLY_DELIVERED: 'Entrega Parcial',
     COMPLETED: 'Completado',
+    CONVERTED: 'Convertido',
     CANCELLED: 'Cancelado',
 };
 
@@ -25,12 +27,14 @@ const paymentStatusColors: Record<OrderPaymentStatus, string> = {
     PENDING: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     PARTIALLY_PAID: 'bg-blue-100 text-blue-800 border-blue-200',
     PAID: 'bg-green-100 text-green-800 border-green-200',
+    CANCELLED: 'bg-red-100 text-red-800 border-red-200',
 };
 
 const paymentStatusLabels: Record<OrderPaymentStatus, string> = {
     PENDING: 'Pendiente',
     PARTIALLY_PAID: 'Pagado Parcialmente',
     PAID: 'Pagado',
+    CANCELLED: 'Cancelado',
 };
 
 export const columns: ColumnDef<Order>[] = [

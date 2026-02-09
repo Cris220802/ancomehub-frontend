@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { OrdersService } from '@/services/orders.service';
 import { PaymentsService } from '@/services/payments.service';
 import { ReviewPaymentDto } from '@/types/payments';
-import { OrderFilters, OrderStatus } from '@/types/orders';
+import { OrderFilters, OrderStatus, QuoteFilters } from '@/types/orders';
 import { toast } from 'sonner';
 
 export const useAdminOrders = () => {
@@ -37,6 +37,22 @@ export const useAdminOrders = () => {
             queryKey: ['admin-payments', orderId],
             queryFn: () => PaymentsService.findPaymentsByOrderId(orderId),
             enabled: !!orderId,
+        });
+    };
+
+    const useGetClientQuotes = (clientId: string, filters?: QuoteFilters) => {
+        return useQuery({
+            queryKey: ['admin-client-quotes', clientId, filters],
+            queryFn: () => OrdersService.findQuotesByClient(clientId, filters),
+            enabled: !!clientId,
+        });
+    };
+
+    const useAdminQuote = (id: string) => {
+        return useQuery({
+            queryKey: ['admin-quote', id],
+            queryFn: () => OrdersService.findOneQuote(id),
+            enabled: !!id,
         });
     };
 
@@ -127,6 +143,8 @@ export const useAdminOrders = () => {
         useGetClientOrders,
         useOrderDetail,
         useOrderPayments,
+        useGetClientQuotes,
+        useAdminQuote,
         // useUpdateOrderStatus,
         useCancelOrder,
         useReviewPayment,

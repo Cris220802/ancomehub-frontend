@@ -1,3 +1,5 @@
+export type Unit = 'PZA' | 'PAIR';
+
 export interface Product {
     id: string;
     sku: string;
@@ -5,13 +7,26 @@ export interface Product {
     description: string;
     imageUrl: string;
     datasheetUrl: string;
-    basePrice: number;
-    stock: number;
+    availableStock: boolean;
     leadTimeDays: number;
     category: any; // Ref: any or { id: string; name: string; }
+    unit: Unit;
+}
+
+export interface ProductAdmin {
+    id: string;
+    sku: string;
+    name: string;
+    description: string;
+    imageUrl: string;
+    datasheetUrl: string;
+    basePrice: number;
+    availableStock: boolean;
+    leadTimeDays: number;
+    category: any; // Ref: any or { id: string; name: string; }
+    unit: Unit;
+    stock: number;
     isActive: boolean;
-    isDeleted: boolean;
-    deletedAt?: string;
     allowBackorder: boolean;
     maxBackorder?: number;
 }
@@ -22,6 +37,7 @@ export interface CreateProductDto {
     description: string;
     basePrice: number;
     stock: number;
+    unit: Unit;
     leadTimeDays: number;
     categoryId: string;
     image?: File;
@@ -30,14 +46,24 @@ export interface CreateProductDto {
     maxBackorder?: number;
 }
 
-export interface UpdateProductDto extends Partial<CreateProductDto> { }
+export interface UpdateProductDto {
+    sku: string;
+    name: string;
+    description: string;
+    basePrice: number;
+    unit: Unit;
+    leadTimeDays: number;
+    categoryId: string;
+    image?: File;
+    datasheet?: File;
+    allowBackorder: boolean;
+    maxBackorder?: number;
+}
 
 export interface FilterProductDto {
     categoryId?: string;
     limit?: number;
     page?: number;
-    minPrice?: number;
-    maxPrice?: number;
     immediateDelivery?: boolean;
 }
 
@@ -56,6 +82,11 @@ export interface productMeta {
 }
 export interface ProductResponse {
     products: Product[];
+    meta: productMeta;
+}
+
+export interface ProductResponseAdmin {
+    products: ProductAdmin[];
     meta: productMeta;
 }
 

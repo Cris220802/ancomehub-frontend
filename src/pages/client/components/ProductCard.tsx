@@ -25,7 +25,7 @@ export const ProductCardDisplay = ({
 
     // Helper to check if it is a full Product (has fields like stock, price)
     const isFullProduct = (p: Product | CatalogProduct): p is Product => {
-        return 'stock' in p && 'basePrice' in p;
+        return 'availableStock' in p;
     };
 
     return (
@@ -90,7 +90,7 @@ export const ProductCardDisplay = ({
                 {/* Disponibilidad (Solo si es full product) */}
                 {isFullProduct(product) && (
                     <div className="mb-4">
-                        {product.stock > 0 ? (
+                        {product.availableStock ? (
                             <div className="flex items-center gap-2 text-emerald-600">
                                 <PackageCheck className="h-4 w-4" />
                                 <span className="text-xs font-semibold">Entrega Inmediata</span>
@@ -115,7 +115,7 @@ export const ProductCardDisplay = ({
                 {/* Footer: Precio y Botón - Solo si showActions (Client Mode) */}
                 {showActions && isFullProduct(product) && (
                     <div className="pt-4 border-t border-gray-100 space-y-3">
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                             <span className="text-xs text-gray-400 font-medium">Precio Unitario</span>
                             <div className="flex items-baseline gap-1">
                                 <span className="text-xl font-bold text-gray-900">
@@ -123,7 +123,7 @@ export const ProductCardDisplay = ({
                                 </span>
                                 <span className="text-[10px] text-gray-500 font-normal">+ IVA</span>
                             </div>
-                        </div>
+                        </div> */}
 
                         {isInCart ? (
                             /* Controles de Cantidad (Placeholder visual) */

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Product } from "../../../types/products"
+import { Product, ProductAdmin } from "../../../types/products"
 import { getImageUrl } from "@/lib/utils"
 
 // Format currency helper
@@ -24,12 +24,12 @@ const formatCurrency = (value: number) => {
 };
 
 interface ColumnsProps {
-    onEdit: (product: Product) => void;
-    onDelete: (product: Product) => void;
-    onToggleStatus: (product: Product) => void;
+    onEdit: (product: ProductAdmin) => void;
+    onDelete: (product: ProductAdmin) => void;
+    onToggleStatus: (product: ProductAdmin) => void;
 }
 
-export const getColumns = ({ onEdit, onDelete, onToggleStatus }: ColumnsProps): ColumnDef<Product>[] => [
+export const getColumns = ({ onEdit, onDelete, onToggleStatus }: ColumnsProps): ColumnDef<ProductAdmin>[] => [
     {
         accessorKey: "imageUrl",
         header: "Imagen",

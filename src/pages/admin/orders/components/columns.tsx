@@ -13,6 +13,7 @@ import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuT
 // Status helpers (reused from OrderDetailPage logic roughly, or centralize later)
 const statusColors: Record<OrderStatus, string> = {
     PENDING: 'bg-yellow-100 text-yellow-800',
+    CONVERTED: 'bg-blue-100 text-blue-800',
     CONFIRMED: 'bg-blue-100 text-blue-800',
     PARTIALLY_DELIVERED: 'bg-indigo-100 text-indigo-800',
     COMPLETED: 'bg-green-100 text-green-800',
@@ -23,10 +24,12 @@ const paymentStatusColors: Record<OrderPaymentStatus, string> = {
     PENDING: 'bg-red-50 text-red-700 border-red-200',
     PARTIALLY_PAID: 'bg-yellow-50 text-yellow-700 border-yellow-200',
     PAID: 'bg-green-50 text-green-700 border-green-200',
+    CANCELLED: 'bg-red-50 text-red-700 border-red-200',
 };
 
 const statusLabels: Record<OrderStatus, string> = {
     PENDING: 'Pendiente',
+    CONVERTED: 'Convertido',
     CONFIRMED: 'Confirmado',
     PARTIALLY_DELIVERED: 'Parcialmente Entregado',
     COMPLETED: 'Completado',
@@ -37,6 +40,7 @@ const paymentStatusLabels: Record<OrderPaymentStatus, string> = {
     PENDING: 'Pendiente',
     PARTIALLY_PAID: 'Pago Parcial',
     PAID: 'Pagado',
+    CANCELLED: 'Cancelado',
 };
 
 export const columns: ColumnDef<Order>[] = [

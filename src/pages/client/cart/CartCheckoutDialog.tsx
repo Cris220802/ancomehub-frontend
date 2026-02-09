@@ -52,20 +52,16 @@ import {
 } from 'lucide-react';
 
 // Types & Hooks
-import { OrderPreviewResponse } from '@/types/orders';
+import { OrderPreviewResponse, PaymentMethod } from '@/types/orders';
 import { useOrders } from '@/pages/client/hooks/useOrders';
 import { useClient } from '@/pages/client/hooks/useClient';
-import { PaymentMethodPayment } from '@/types/payments';
 import { IncompleteProfileDialog } from '@/pages/client/components/IncompleteProfileDialog';
 
 // --- CONFIGURACIÓN ---
 
-const paymentConfig: Record<PaymentMethodPayment, { label: string; icon: any; description: string }> = {
-    CASH: { label: 'Efectivo', icon: Banknote, description: 'Contra entrega' },
-    TRANSFER: { label: 'Transferencia', icon: Building2, description: 'SPEI / Banco' },
-    CREDIT: { label: 'Crédito Ancome', icon: Wallet, description: 'Línea de crédito' },
-    CHECK: { label: 'Cheque', icon: FileText, description: 'Salvo buen cobro' },
-    DEPOSIT: { label: 'Depósito', icon: CreditCard, description: 'Ventanilla' },
+const paymentConfig: Record<PaymentMethod, { label: string; icon: any; description: string }> = {
+    CASH_PAYMENT: { label: 'Pago de Contado', icon: Banknote, description: '' },
+    CREDIT_PAYMENT: { label: 'Crédito Ancome', icon: Wallet, description: 'Línea de crédito Ancome' },
 };
 
 const formatCurrency = (amount: number) => {
@@ -73,7 +69,7 @@ const formatCurrency = (amount: number) => {
 };
 
 const formSchema = z.object({
-    paymentMethod: z.enum(['CASH', 'TRANSFER', 'CREDIT', 'CHECK', 'DEPOSIT'] as const, {
+    paymentMethod: z.enum(['CASH_PAYMENT', 'CREDIT_PAYMENT'] as const, {
         message: "Selecciona un método de pago.",
     }),
     requiresInvoice: z.boolean(),
@@ -95,10 +91,6 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
     const [previewData, setPreviewData] = useState<OrderPreviewResponse | null>(null);
 
     const {
-        createOrderPreview,
-        isCreatingOrderPreview,
-        createOrder,
-        isCreatingOrder,
         showIncompleteProfileDialog,
         setShowIncompleteProfileDialog
     } = useOrders();
@@ -164,11 +156,11 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
             const shippingIndex = form.getValues('shippingAddressIndex');
             const selectedAddress = shippingAddresses[parseInt(shippingIndex)];
 
-            await createOrder({
-                paymentMethod: form.getValues('paymentMethod'),
-                requiresInvoice: form.getValues('requiresInvoice'),
-                shippingInfo: selectedAddress
-            });
+            // await createOrder({
+            //     paymentMethod: form.getValues('paymentMethod'),
+            //     requiresInvoice: form.getValues('requiresInvoice'),
+            //     shippingInfo: selectedAddress
+            // });
 
             setIsOpen(false);
             resetState();

@@ -9,3 +9,18 @@ export interface Notification {
     metadata?: Record<string, any>;
     createdAt: string;
 }
+
+export interface PaginatedNotificationResponse {
+    items: Notification[];
+    meta: {
+        total: number;
+        page: number;
+        lastPage: number;
+        unreadCount: number;
+    }
+}
+
+export interface NotificationFilter {
+    page?: number;
+    limit?: number;
+}

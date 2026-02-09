@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { CartTrigger } from '@/components/layout/CartTrigger';
 import { CartSheet } from '@/pages/client/cart/components/CartSheet';
 import { cn } from '@/lib/utils';
+import { NotificationsMenu } from '@/components/layout/NotificationsMenu';
 
 // Configuración centralizada de la navegación
 const navItems = [
@@ -118,7 +119,7 @@ export const ClientLayout = () => {
                         </div>
 
                         {/* CENTRO: Search Bar (Solo Desktop) */}
-                        <div className="hidden md:flex flex-1 max-w-2xl relative">
+                        {/* <div className="hidden md:flex flex-1 max-w-2xl relative">
                             <div className="relative w-full">
                                 <Search className="absolute left-4 top-3 h-5 w-5 text-gray-500" />
                                 <Input
@@ -127,17 +128,13 @@ export const ClientLayout = () => {
                                     className="w-full pl-12 h-11 rounded-md bg-gray-100 border-transparent focus:bg-white focus:border-primary transition-all text-base"
                                 />
                             </div>
-                        </div>
+                        </div> */}
 
                         {/* DERECHA: Acciones */}
                         <div className="flex items-center gap-2 md:gap-4 shrink-0">
 
                             {/* Notificaciones (Nuevo) */}
-                            <Button variant="ghost" size="icon" className="relative text-gray-500 hover:text-gray-900">
-                                <Bell className="h-5 w-5" />
-                                {/* Indicador de no leídos */}
-                                <span className="absolute top-2.5 right-2.5 h-2 w-2 bg-red-500 rounded-full border border-white" />
-                            </Button>
+                            <NotificationsMenu />
 
                             {/* Carrito */}
                             <CartTrigger />

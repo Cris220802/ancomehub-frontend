@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAdminOrders } from "@/pages/admin/hooks/useAdminOrders";
 import { OrderStatus, RegisterShipmentDto } from "@/types/orders";
@@ -35,7 +35,9 @@ import {
     Clock,
     AlertTriangle,
     PackageCheck,
-    Truck
+    Truck,
+    FileText,
+    Eye
 } from "lucide-react";
 import { PaymentReviewCard } from "./components/PaymentReviewCard";
 import { getImageUrl, cn } from "@/lib/utils";
@@ -59,6 +61,7 @@ import { Input } from "@/components/ui/Input";
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon?: React.ReactNode }> = {
     PENDING: { label: 'Pendiente', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' },
     CONFIRMED: { label: 'Confirmado', color: 'bg-blue-100 text-blue-800 border-blue-200' },
+    CONVERTED: { label: 'Convertido', color: 'bg-green-100 text-green-800 border-green-200' },
     PARTIALLY_DELIVERED: { label: 'Parcial', color: 'bg-orange-100 text-orange-800 border-orange-200' },
     CANCELLED: { label: 'Cancelado', color: 'bg-red-100 text-red-800 border-red-200' },
     COMPLETED: { label: 'Completado', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
@@ -122,6 +125,20 @@ export const OrderDetailPage = () => {
 
     // Un pedido es "entregable" si está confirmado o parcial Y tiene ítems apartados
     const isDeliverable = (order.status === 'CONFIRMED' || order.status === 'PARTIALLY_DELIVERED') && hasAllocated;
+
+    // Parse shippingInfo safely
+    const shippingInfo = useMemo(() => {
+        if (!order?.shippingInfo) return null;
+        if (typeof order.shippingInfo === 'string') {
+            try {
+                return JSON.parse(order.shippingInfo);
+            } catch (e) {
+                console.error("Error parsing shippingInfo:", e);
+                return null;
+            }
+        }
+        return order.shippingInfo;
+    }, [order?.shippingInfo]);
 
     const handleCancelOrder = () => {
         if (!id) return;
@@ -437,20 +454,38 @@ export const OrderDetailPage = () => {
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    {order.shippingInfo ? (
+                                    {shippingInfo ? (
                                         <div className="text-sm text-gray-600 space-y-1">
                                             <p className="font-medium text-gray-900">
-                                                {order.shippingInfo.street} {order.shippingInfo.exteriorNumber}
+                                                {shippingInfo.street} {shippingInfo.exteriorNumber}
                                             </p>
-                                            <p>{order.shippingInfo.neighborhood}</p>
-                                            <p>{order.shippingInfo.city}, {order.shippingInfo.state}</p>
-                                            <p className="text-xs text-gray-400 font-mono">CP: {order.shippingInfo.zipCode}</p>
+                                            <p>{shippingInfo.neighborhood}</p>
+                                            <p>{shippingInfo.city}, {shippingInfo.state}</p>
+                                            <p className="text-xs text-gray-400 font-mono">CP: {shippingInfo.zipCode}</p>
                                         </div>
                                     ) : (
                                         <p className="text-xs text-gray-400 italic">Sin dirección (Digital/Recolección)</p>
                                     )}
                                 </CardContent>
                             </Card>
+                            {
+                                order.purchaseOrderUrl && (
+                                    <Card className="shadow-sm">
+                                        <CardHeader className="pb-3">
+                                            <CardTitle className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
+                                                <FileText className="h-3.5 w-3.5" /> Orden de Compra
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <a className="text-primary hover:underline text-sm flex items-center gap-2" href={getImageUrl(order.purchaseOrderUrl)} target="_blank" rel="noopener noreferrer">
+                                                <Eye className="h-3.5 w-3.5" />
+                                                Ver Orden de Compra
+                                            </a>
+                                        </CardContent>
+                                    </Card>
+                                )
+                            }
+
                         </div>
                     </div>
 

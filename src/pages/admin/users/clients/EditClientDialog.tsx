@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -19,15 +20,20 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form';
-import { ResendInviteDialog } from './ResendInviteDialog';
-import { useAdminClients } from '../../hooks/useAdminClients';
-import { useEffect, useState } from 'react';
-import { InviteUserDto } from '@/types/users';
-import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
+import { updateClientDataDto } from '@/types/users';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
-const inviteSchema = z.object({
-    email: z.string().email('Email inválido'),
+const editClientSchema = z.object({
     companyName: z.string().min(1, 'La razón social es requerida'),
     taxId: z.string().min(1, 'El RFC es requerido'),
     requiresOrderPurchase: z.boolean(),
@@ -43,25 +49,29 @@ const inviteSchema = z.object({
     }),
 });
 
-type InviteFormValues = z.infer<typeof inviteSchema>;
+type EditClientFormValues = z.infer<typeof editClientSchema>;
 
-interface InviteClientDialogProps {
+interface EditClientDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    initialData: any; // Using any for flexibility with partial data from backend
+    onSubmit: (data: updateClientDataDto) => void;
+    isLoading?: boolean;
 }
 
-export function InviteClientDialog({ open, onOpenChange }: InviteClientDialogProps) {
-    const { useInviteClient, useBeforeInviteClient } = useAdminClients();
-    const inviteMutation = useInviteClient();
-    const beforeInviteMutation = useBeforeInviteClient();
+export function EditClientDialog({
+    open,
+    onOpenChange,
+    initialData,
+    onSubmit,
+    isLoading
+}: EditClientDialogProps) {
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [pendingValues, setPendingValues] = useState<EditClientFormValues | null>(null);
 
-    const [showResendDialog, setShowResendDialog] = useState(false);
-    const [pendingInviteValues, setPendingInviteValues] = useState<InviteUserDto | null>(null);
-
-    const form = useForm<InviteFormValues>({
-        resolver: zodResolver(inviteSchema) as any,
+    const form = useForm<EditClientFormValues>({
+        resolver: zodResolver(editClientSchema) as any,
         defaultValues: {
-            email: '',
             companyName: '',
             taxId: '',
             requiresOrderPurchase: false,
@@ -79,63 +89,35 @@ export function InviteClientDialog({ open, onOpenChange }: InviteClientDialogPro
     });
 
     useEffect(() => {
-        if (open) {
+        if (open && initialData) {
             form.reset({
-                email: '',
-                companyName: '',
-                taxId: '',
-                requiresOrderPurchase: false,
+                companyName: initialData.clientProfile.companyName || '',
+                taxId: initialData.clientProfile.taxId || '',
+                requiresOrderPurchase: initialData.requiresOrderPurchase || false,
                 billingAddress: {
-                    street: '',
-                    exteriorNumber: '',
-                    interiorNumber: '',
-                    neighborhood: '',
-                    city: '',
-                    state: '',
-                    zipCode: '',
-                    country: 'México',
+                    street: initialData.clientProfile.billingAddress?.street || '',
+                    exteriorNumber: initialData.clientProfile.billingAddress?.exteriorNumber || '',
+                    interiorNumber: initialData.clientProfile.billingAddress?.interiorNumber || '',
+                    neighborhood: initialData.clientProfile.billingAddress?.neighborhood || '',
+                    city: initialData.clientProfile.billingAddress?.city || '',
+                    state: initialData.clientProfile.billingAddress?.state || '',
+                    zipCode: initialData.clientProfile.billingAddress?.zipCode || '',
+                    country: initialData.clientProfile.billingAddress?.country || 'México',
                 },
             });
         }
-    }, [open, form]);
+    }, [open, initialData, form]);
 
-    const onSubmit = (values: InviteFormValues) => {
-        beforeInviteMutation.mutate(values, {
-            onSuccess: () => {
-                onOpenChange(false);
-                form.reset();
-            },
-            onError: (error: any) => {
-                // Assuming 409 or a specific message indicates user exists
-                // The requirements say "in case the user already exists... open checks dialog"
-                // We will trigger this if the request fails, primarily checking for existence.
-                // You might want to check error.response.status === 409 or similar if the API is strict.
-                // For now, let's assume specific error handling logic or just broad catch for "user exists" context if implied by backend design. 
-                // However, based on the prompt "en caso de que el usuario ya exista se habra otro dialog",
-                // usually this comes as a 400 or 409 with a message.
-
-                // Let's assume we proceed to show dialog if it fails, or check message.
-                if (error.response?.data?.message?.includes('ya existe') || error.response?.status === 409 || error.response?.status === 400) {
-                    setPendingInviteValues(values);
-                    setShowResendDialog(true);
-                } else {
-                    toast.error(error.response?.data?.message || 'Error al validar invitación');
-                }
-            },
-        });
+    const handleFormSubmit = (values: EditClientFormValues) => {
+        setPendingValues(values);
+        setShowConfirmDialog(true);
     };
 
-    const handleResend = () => {
-        if (!pendingInviteValues) return;
-
-        inviteMutation.mutate(pendingInviteValues, {
-            onSuccess: () => {
-                setShowResendDialog(false);
-                onOpenChange(false);
-                form.reset();
-                setPendingInviteValues(null);
-            },
-        });
+    const handleConfirm = () => {
+        if (pendingValues) {
+            onSubmit(pendingValues);
+            setShowConfirmDialog(false);
+        }
     };
 
     return (
@@ -143,28 +125,16 @@ export function InviteClientDialog({ open, onOpenChange }: InviteClientDialogPro
             <Dialog open={open} onOpenChange={onOpenChange}>
                 <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
-                        <DialogTitle>Invitar Cliente</DialogTitle>
+                        <DialogTitle>Editar Información Fiscal</DialogTitle>
                         <DialogDescription>
-                            Envía una invitación por correo electrónico para que el cliente complete su registro.
+                            Actualiza la información fiscal y de facturación del cliente.
                         </DialogDescription>
                     </DialogHeader>
+
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
                             <div className="space-y-4">
                                 <h3 className="text-lg font-medium">Información General</h3>
-                                <FormField
-                                    control={form.control}
-                                    name="email"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel>Correo Electrónico</FormLabel>
-                                            <FormControl>
-                                                <Input placeholder="cliente@empresa.com" {...field} />
-                                            </FormControl>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                                 <div className="grid grid-cols-2 gap-4">
                                     <FormField
                                         control={form.control}
@@ -322,8 +292,8 @@ export function InviteClientDialog({ open, onOpenChange }: InviteClientDialogPro
                                 >
                                     Cancelar
                                 </Button>
-                                <Button type="submit" isLoading={inviteMutation.isPending}>
-                                    Enviar Invitación
+                                <Button type="submit" isLoading={isLoading}>
+                                    Guardar Cambios
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -331,13 +301,20 @@ export function InviteClientDialog({ open, onOpenChange }: InviteClientDialogPro
                 </DialogContent>
             </Dialog>
 
-            <ResendInviteDialog
-                open={showResendDialog}
-                onOpenChange={setShowResendDialog}
-                onConfirm={handleResend}
-                email={pendingInviteValues?.email || ''}
-                isLoading={inviteMutation.isPending}
-            />
+            <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>¿Está seguro de guardar los cambios?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Esta acción actualizará la información fiscal del cliente. Verifique que los datos sean correctos.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirm}>Confirmar</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

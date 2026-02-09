@@ -1,9 +1,10 @@
 import { Address } from "./users";
 
-export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PARTIALLY_DELIVERED' | 'COMPLETED' | 'CANCELLED';
-export type PaymentMethod = 'CASH' | 'TRANSFER' | 'CREDIT' | 'CHECK' | 'DEPOSIT';
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'PARTIALLY_DELIVERED' | 'COMPLETED' | 'CANCELLED' | 'CONVERTED';
+export type QuoteStatus = 'PENDING' | 'CONVERTED';
+export type PaymentMethod = 'CASH_PAYMENT' | 'CREDIT_PAYMENT';
 export type OrderType = 'ORDER' | 'QUOTE';
-export type OrderPaymentStatus = 'PENDING' | 'PARTIALLY_PAID' | 'PAID';
+export type OrderPaymentStatus = 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'CANCELLED';
 
 export interface UserSummaryDto {
     id: string;
@@ -47,6 +48,18 @@ export interface Order {
     items: OrderItemSummaryDto[];
 }
 
+export interface Quote {
+    id: string;
+    folio: string;
+    type: OrderType;
+    status: OrderStatus;
+    totalAmount: number;
+    createdAt: string;
+    validUntil: string | null;
+    user: UserSummaryDto;
+    items: OrderItemSummaryDto[];
+}
+
 export interface OrderDetail extends Order {
     shippingInfo: any;
     validUntil: string | null;
@@ -54,10 +67,14 @@ export interface OrderDetail extends Order {
     fiscalDocuments?: any[];
 }
 
+export interface QuoteDetail extends Quote {
+    items: OrderItemDetailDto[];
+}
+
 export interface CreateOrderDto {
     paymentMethod: PaymentMethod;
     requiresInvoice: boolean;
-    purchaseOrderUrl?: string;
+    file?: File;
     shippingInfo: Address;
 }
 
@@ -104,8 +121,28 @@ export interface OrderFilters {
     validUntilTo?: string;
 }
 
+export interface QuoteFilters {
+    page?: number;
+    limit?: number;
+    folio?: string;
+    status?: QuoteStatus;
+    dateFrom?: string;
+    dateTo?: string;
+    validUntilFrom?: string;
+    validUntilTo?: string;
+}
+
 export interface PaginatedOrdersResponse {
     items: Order[];
+    meta: {
+        total: number;
+        page: number;
+        lastPage: number;
+    };
+}
+
+export interface PaginatedQuotesResponse {
+    items: Quote[];
     meta: {
         total: number;
         page: number;

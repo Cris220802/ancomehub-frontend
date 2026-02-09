@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { CreateProductDto, Product } from '../../../types/products';
+// Asegúrate de importar UpdateProductDto
+import { CreateProductDto, UpdateProductDto, ProductAdmin } from '../../../types/products';
 import { useCategories } from '../../categories/hooks/useCategories';
 import { Button } from '@/components/ui/Button';
 import {
@@ -26,13 +27,13 @@ import { getImageUrl } from '@/lib/utils';
 import { FileIcon } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 
-// 1. Schema (Sin cambios)
 const formSchema = z.object({
     sku: z.string().min(1, 'El SKU es requerido'),
     name: z.string().min(1, 'El nombre es requerido'),
     description: z.string().optional(),
     basePrice: z.coerce.number().min(0, 'El precio debe ser mayor o igual a 0'),
     stock: z.coerce.number().int().min(0, 'El stock debe ser mayor o igual a 0'),
+    unit: z.enum(['PZA', 'PAIR'], { message: 'Unidad inválida' }),
     leadTimeDays: z.coerce.number().int().min(0, 'El tiempo de entrega debe ser positivo'),
     allowBackorder: z.boolean().default(false),
     maxBackorder: z.coerce.number().min(0, 'El máximo de backorder debe ser mayor o igual a 0').optional(),
@@ -44,8 +45,9 @@ const formSchema = z.object({
 type ProductFormValues = z.infer<typeof formSchema>;
 
 interface ProductFormProps {
-    defaultValues?: Product;
-    onSubmit: (data: CreateProductDto) => void;
+    defaultValues?: ProductAdmin;
+    // Cambio 1: Permitir ambos tipos de DTO en la firma
+    onSubmit: (data: CreateProductDto | UpdateProductDto) => void;
     isSubmitting: boolean;
     onCancel?: () => void;
 }
@@ -53,8 +55,8 @@ interface ProductFormProps {
 export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }: ProductFormProps) => {
     const { categories } = useCategories();
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const isEditMode = !!defaultValues; // Bandera para saber si editamos
 
-    // 2. useForm sin genérico explícito (para evitar conflicto de tipos)
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -67,6 +69,7 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
             allowBackorder: false,
             maxBackorder: 0,
             categoryId: '',
+            unit: 'PZA',
         },
     });
 
@@ -82,6 +85,7 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                 allowBackorder: defaultValues.allowBackorder || false,
                 maxBackorder: defaultValues.maxBackorder,
                 categoryId: defaultValues.category?.id || '',
+                unit: defaultValues.unit || 'PZA',
             });
             if (defaultValues.imageUrl) {
                 setImagePreview(defaultValues.imageUrl);
@@ -97,19 +101,30 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                 allowBackorder: false,
                 maxBackorder: 0,
                 categoryId: '',
+                unit: 'PZA',
             });
             setImagePreview(null);
         }
     }, [defaultValues, form]);
 
     const handleSubmit = (data: ProductFormValues) => {
-        const productDto: CreateProductDto = {
+        // Preparamos la data base (archivos, etc)
+        const commonData = {
             ...data,
             description: data.description || '',
             image: (data.image instanceof FileList && data.image.length > 0) ? data.image[0] : undefined,
             datasheet: (data.datasheet instanceof FileList && data.datasheet.length > 0) ? data.datasheet[0] : undefined,
         };
-        onSubmit(productDto);
+
+        // Cambio 2: Lógica condicional para eliminar 'stock' si es edición
+        if (isEditMode) {
+            // Extraemos stock y nos quedamos con el resto (updateDto)
+            const { stock, ...updateDto } = commonData;
+            onSubmit(updateDto as UpdateProductDto);
+        } else {
+            // Si es crear, enviamos todo (createDto)
+            onSubmit(commonData as CreateProductDto);
+        }
     };
 
     return (
@@ -124,7 +139,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                             <FormItem>
                                 <FormLabel>SKU</FormLabel>
                                 <FormControl>
-                                    {/* CORRECCIÓN: Castear field.value a string */}
                                     <Input
                                         placeholder="COD-001"
                                         {...field}
@@ -142,7 +156,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                             <FormItem>
                                 <FormLabel>Nombre</FormLabel>
                                 <FormControl>
-                                    {/* CORRECCIÓN */}
                                     <Input
                                         placeholder="Nombre del producto"
                                         {...field}
@@ -162,7 +175,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                         <FormItem>
                             <FormLabel>Descripción</FormLabel>
                             <FormControl>
-                                {/* CORRECCIÓN */}
                                 <Textarea
                                     placeholder="Descripción detallada..."
                                     {...field}
@@ -182,7 +194,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                             <FormItem>
                                 <FormLabel>Precio Base ($)</FormLabel>
                                 <FormControl>
-                                    {/* CORRECCIÓN: Castear a number o string */}
                                     <Input
                                         type="number"
                                         step="0.01"
@@ -194,26 +205,50 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                             </FormItem>
                         )}
                     />
-                    {!defaultValues && (
-                        <FormField
-                            control={form.control}
-                            name="stock"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Stock</FormLabel>
+
+                    {/* Cambio 3: Deshabilitar visualmente el input de Stock si estamos editando */}
+                    <FormField
+                        control={form.control}
+                        name="stock"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Stock {isEditMode && <span className="text-xs font-normal text-muted-foreground">(No editable aquí)</span>}</FormLabel>
+                                <FormControl>
+                                    <Input
+                                        type="number"
+                                        {...field}
+                                        value={field.value as number ?? ''}
+                                        disabled={isEditMode} // Deshabilitado en edición
+                                        className={isEditMode ? "bg-gray-100 text-gray-500" : ""}
+                                    />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
+                    <FormField
+                        control={form.control}
+                        name="unit"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Unidad</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                     <FormControl>
-                                        {/* CORRECCIÓN */}
-                                        <Input
-                                            type="number"
-                                            {...field}
-                                            value={field.value as number ?? ''}
-                                        />
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Selecciona una unidad" />
+                                        </SelectTrigger>
                                     </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                    )}
+                                    <SelectContent>
+                                        <SelectItem value="PZA">PZA</SelectItem>
+                                        <SelectItem value="PAIR">PAR</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+
                     <FormField
                         control={form.control}
                         name="leadTimeDays"
@@ -221,7 +256,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                             <FormItem>
                                 <FormLabel>Tiempo Entrega (Días)</FormLabel>
                                 <FormControl>
-                                    {/* CORRECCIÓN */}
                                     <Input
                                         type="number"
                                         {...field}
@@ -285,7 +319,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Categoría</FormLabel>
-                            {/* CORRECCIÓN: El Select maneja su propio value como string */}
                             <Select
                                 onValueChange={field.onChange}
                                 value={field.value as string}
@@ -333,7 +366,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                                         {...fieldProps}
                                         type="file"
                                         accept="image/*"
-                                        // Importante: No pasamos 'value' al input file
                                         onChange={(e) => {
                                             const files = e.target.files;
                                             if (files && files.length > 0) {
@@ -373,7 +405,6 @@ export const ProductForm = ({ defaultValues, onSubmit, isSubmitting, onCancel }:
                                         {...fieldProps}
                                         type="file"
                                         accept="application/pdf"
-                                        // Importante: No pasamos 'value' al input file
                                         onChange={(e) => {
                                             const files = e.target.files;
                                             if (files && files.length > 0) {

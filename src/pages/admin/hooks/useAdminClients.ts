@@ -4,6 +4,7 @@ import {
     AssignClientCreditDto,
     ClientsFilterDto,
     InviteUserDto,
+    updateClientDataDto,
 } from '@/types/users';
 import { toast } from 'sonner';
 
@@ -33,6 +34,7 @@ export const useAdminClients = () => {
                 queryClient.invalidateQueries({ queryKey: ['admin-clients'] });
             },
             onError: (error: any) => {
+                console.log(error);
                 toast.error(error.response?.data?.message || 'Error al enviar invitación');
             },
         });
@@ -66,6 +68,21 @@ export const useAdminClients = () => {
         });
     };
 
+    const useUpdateClientData = () => {
+        return useMutation({
+            mutationFn: ({ id, dto }: { id: string; dto: updateClientDataDto }) =>
+                UsersService.updateClientData(id, dto),
+            onSuccess: () => {
+                toast.success('Información actualizada correctamente');
+                queryClient.invalidateQueries({ queryKey: ['admin-clients'] });
+                queryClient.invalidateQueries({ queryKey: ['admin-client-detail'] });
+            },
+            onError: (error: any) => {
+                toast.error(error.response?.data?.message || 'Error al actualizar información');
+            },
+        });
+    };
+
     const useManageCredit = () => {
         return useMutation({
             mutationFn: async (dto: AssignClientCreditDto) => {
@@ -92,6 +109,7 @@ export const useAdminClients = () => {
         useInviteClient,
         useBeforeInviteClient,
         useUpdateClientStatus,
+        useUpdateClientData,
         useManageCredit,
     };
 };

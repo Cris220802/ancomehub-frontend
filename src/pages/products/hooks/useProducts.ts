@@ -30,7 +30,13 @@ export const useProducts = () => {
 
     const productQuery = useQuery({
         queryKey: ['product', searchId],
-        queryFn: () => ProductsService.findOne(searchId),
+        queryFn: () => {
+            if (isClient) {
+                return ProductsService.findOne(searchId);
+            }
+            // Por defecto asumimos Admin (o si añades más roles, ajusta aquí)
+            return ProductsService.findOneAdmin(searchId);
+        },
         enabled: !!searchId && searchId.length > 0,
         retry: 0,
     });

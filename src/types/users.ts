@@ -32,11 +32,20 @@ export interface UpdateClientProfileDto {
     // Shipping es UN ARREGLO de objetos (Esto es lo más importante)
     shippingAddresses: Address[];
 }
+
+export interface updateClientDataDto {
+    companyName?: string;
+    taxId?: string;
+    requiresOrderPurchase?: boolean;
+    billingAddress?: Address;
+}
+
 export interface InviteUserDto {
     email: string;
     companyName: string;
-    taxId?: string;
-    phoneNumber?: string;
+    taxId: string;
+    requiresOrderPurchase: boolean;
+    billingAddress: Address;
 }
 
 export interface CompleteRegistrationDto {
@@ -86,6 +95,7 @@ export interface ClientDetailResponseDto {
     email: string;
     fullName?: string | null;
     phoneNumber?: string | null;
+    requiresOrderPurchase?: boolean;
     status: UserStatus;
     clientProfile: ClientProfileResponseDto;
 

@@ -25,6 +25,10 @@ import {
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils'; // Asegúrate de tener esta utilidad
 import { ClientOrdersTable } from './components/ClientOrdersTable';
+import { ClientQuotesTable } from './components/ClientQuotesTable';
+import { useState } from 'react';
+import { EditClientDialog } from './EditClientDialog';
+import { updateClientDataDto } from '@/types/users';
 
 // Utility to format address safely
 const formatAddress = (address: any) => {
@@ -47,10 +51,25 @@ const formatAddress = (address: any) => {
 export default function ClientDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { useGetClientDetail, useManageCredit } = useAdminClients();
+    const { useGetClientDetail, useManageCredit, useUpdateClientData } = useAdminClients();
 
     const { data: client, isLoading, error } = useGetClientDetail(id!);
     const creditMutation = useManageCredit();
+    const updateClientMutation = useUpdateClientData();
+
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+    const handleUpdateClient = (data: updateClientDataDto) => {
+        if (!client) return;
+        updateClientMutation.mutate(
+            { id: client.id, dto: data },
+            {
+                onSuccess: () => {
+                    setIsEditDialogOpen(false);
+                },
+            }
+        );
+    };
 
     if (isLoading) {
         return (
@@ -130,6 +149,11 @@ export default function ClientDetailPage() {
                                     {client.phoneNumber || 'Sin número de teléfono'}
                                 </span>
                                 <Separator orientation="vertical" className="h-4" />
+                                <span className="flex items-center gap-1">
+                                    <ShoppingBag className="h-3.5 w-3.5" />
+                                    Requiere orden de compra para hacer pedidos: {client.requiresOrderPurchase ? 'Sí' : 'No'}
+                                </span>
+                                <Separator orientation="vertical" className="h-4" />
                                 <Badge variant={client.status === 'ACTIVE' ? 'default' : 'secondary'} className="text-xs px-2">
                                     {client.status === 'ACTIVE' ? 'Activo' : 'Inactivo'}
                                 </Badge>
@@ -138,8 +162,10 @@ export default function ClientDetailPage() {
                     </div>
                 </div>
 
-                {/* Acciones Rápidas (Placeholder para editar) */}
-                {/* <Button variant="outline">Editar Cliente</Button> */}
+                {/* Acciones Rápidas */}
+                <Button variant="outline" onClick={() => setIsEditDialogOpen(true)}>
+                    Editar Información Fiscal
+                </Button>
             </div>
 
             {/* --- CONTENIDO PRINCIPAL --- */}
@@ -150,6 +176,9 @@ export default function ClientDetailPage() {
                     </TabsTrigger>
                     <TabsTrigger value="orders" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3">
                         Pedidos
+                    </TabsTrigger>
+                    <TabsTrigger value="quotes" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3">
+                        Cotizaciones
                     </TabsTrigger>
                     <TabsTrigger value="credit" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent py-3">
                         Finanzas y Crédito
@@ -236,6 +265,20 @@ export default function ClientDetailPage() {
                         </CardHeader>
                         <CardContent>
                             <ClientOrdersTable clientId={client.id} />
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* --- TAB: QUOTES --- */}
+                <TabsContent value="quotes">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <History className="h-4 w-4 text-gray-500" /> Historial de Cotizaciones
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <ClientQuotesTable clientId={client.id} />
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -344,6 +387,16 @@ export default function ClientDetailPage() {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            {client && (
+                <EditClientDialog
+                    open={isEditDialogOpen}
+                    onOpenChange={setIsEditDialogOpen}
+                    initialData={client}
+                    onSubmit={handleUpdateClient}
+                    isLoading={updateClientMutation.isPending}
+                />
+            )}
         </div>
     );
 }
