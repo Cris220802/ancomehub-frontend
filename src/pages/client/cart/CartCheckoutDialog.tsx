@@ -112,35 +112,35 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
         form.reset();
     };
 
-    const handleOpenChange = (open: boolean) => {
-        if ((isCreatingOrder || isCreatingOrderPreview) && !open) return;
-        setIsOpen(open);
-        if (!open) resetState();
-    };
+    // const handleOpenChange = (open: boolean) => {
+    //     if ((isCreatingOrder || isCreatingOrderPreview) && !open) return;
+    //     setIsOpen(open);
+    //     if (!open) resetState();
+    // };
 
     // Validación exitosa
-    const onDetailsSubmit = async (values: FormValues) => {
-        const selectedAddress = shippingAddresses[parseInt(values.shippingAddressIndex)];
+    // const onDetailsSubmit = async (values: FormValues) => {
+    //     const selectedAddress = shippingAddresses[parseInt(values.shippingAddressIndex)];
 
-        // Doble verificación por seguridad, aunque Zod ya validó que existe un string
-        if (!selectedAddress) {
-            toast.error("La dirección seleccionada no es válida.");
-            return;
-        }
+    //     // Doble verificación por seguridad, aunque Zod ya validó que existe un string
+    //     if (!selectedAddress) {
+    //         toast.error("La dirección seleccionada no es válida.");
+    //         return;
+    //     }
 
-        try {
-            const preview = await createOrderPreview({
-                paymentMethod: values.paymentMethod,
-                requiresInvoice: values.requiresInvoice,
-                shippingInfo: selectedAddress
-            });
-            setPreviewData(preview);
-            setStep('preview');
-        } catch (error) {
-            console.error(error);
-            toast.error("Error verificando disponibilidad.");
-        }
-    };
+    //     try {
+    //         const preview = await createOrderPreview({
+    //             paymentMethod: values.paymentMethod,
+    //             requiresInvoice: values.requiresInvoice,
+    //             shippingInfo: selectedAddress
+    //         });
+    //         setPreviewData(preview);
+    //         setStep('preview');
+    //     } catch (error) {
+    //         console.error(error);
+    //         toast.error("Error verificando disponibilidad.");
+    //     }
+    // };
 
     // NUEVO: Manejo de errores de validación del formulario
     const onDetailsErrors = (errors: FieldErrors<FormValues>) => {
@@ -278,7 +278,7 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
 
     return (
         <>
-            <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+            {/* <Dialog open={isOpen} onOpenChange={handleOpenChange}>
                 <DialogTrigger
                     className={cn(
                         buttonVariants({ size: 'lg' }),
@@ -292,9 +292,9 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
                     </span>
                 </DialogTrigger>
 
-                <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden rounded-xl">
-                    {/* Header */}
-                    <div className="bg-gray-50/80 p-6 border-b pb-4">
+                <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden rounded-xl"> */}
+            {/* Header */}
+            {/* <div className="bg-gray-50/80 p-6 border-b pb-4">
                         <DialogHeader className="mb-4">
                             <DialogTitle className="text-xl font-bold flex items-center gap-2">
                                 {step === 'details' ? <CreditCard className="h-5 w-5 text-primary" /> : <Receipt className="h-5 w-5 text-primary" />}
@@ -305,17 +305,17 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
                             </DialogDescription>
                         </DialogHeader>
                         <ProgressBar />
-                    </div>
+                    </div> */}
 
-                    {/* Body */}
-                    <div className="p-6 overflow-y-auto max-h-[65vh]">
+            {/* Body */}
+            {/* <div className="p-6 overflow-y-auto max-h-[65vh]">
                         {step === 'details' && (
                             <Form {...form}>
                                 {/* CORRECCIÓN: Agregamos onDetailsErrors como segundo argumento para capturar errores de Zod */}
-                                <form id="checkout-form" onSubmit={form.handleSubmit(onDetailsSubmit, onDetailsErrors)} className="space-y-8">
+            {/* <form id="checkout-form" onSubmit={form.handleSubmit(onDetailsSubmit, onDetailsErrors)} className="space-y-8"> */}
 
-                                    {/* DIRECCIONES */}
-                                    <div className="space-y-3">
+            {/* DIRECCIONES */}
+            {/* <div className="space-y-3">
                                         <div className="flex items-center justify-between">
                                             <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Dirección de Envío</Label>
                                             <Link to="/client/profile" className="text-xs font-medium text-primary hover:text-primary/80 flex items-center gap-1 transition-colors">
@@ -370,10 +370,10 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
                                         )}
                                     </div>
 
-                                    <Separator className="bg-gray-100" />
+                                    <Separator className="bg-gray-100" />  */}
 
-                                    {/* PAGOS */}
-                                    <div className="space-y-3">
+            {/* PAGOS */}
+            {/* <div className="space-y-3">
                                         <Label className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Método de Pago</Label>
                                         <span className="text-xs text-gray-500">El sistema no procesará el pago, debes seleccionar un método de pago solo para tener referencia en el pedido</span>
                                         <Separator className="bg-gray-100" />
@@ -403,10 +403,10 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
                                                 </RadioGroup>
                                             )}
                                         />
-                                    </div>
+                                    </div> */}
 
-                                    {/* FACTURA */}
-                                    <FormField
+            {/* FACTURA */}
+            {/* <FormField
                                         control={form.control}
                                         name="requiresInvoice"
                                         render={({ field }) => (
@@ -423,19 +423,19 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
                                     />
                                 </form>
                             </Form>
-                        )}
+                        )} */}
 
-                        {step === 'preview' && (
+            {/* {step === 'preview' && (
                             <div className="space-y-6">
                                 {previewData && !previewData.canProceed && renderErrorPreview(previewData.items.filter((i: any) => i.status === 'ERROR'))}
                                 {previewData && previewData.canProceed && previewData.hasBackorders && renderBackorderPreview(previewData.items.filter((i: any) => i.status === 'PARTIAL'))}
                                 {previewData && previewData.canProceed && !previewData.hasBackorders && renderSuccessPreview()}
                             </div>
                         )}
-                    </div>
+                    </div> */}
 
-                    {/* Footer */}
-                    <div className="bg-gray-50 p-4 border-t flex items-center justify-between gap-4">
+            {/* Footer */}
+            {/* <div className="bg-gray-50 p-4 border-t flex items-center justify-between gap-4">
                         {step === 'details' ? (
                             <>
                                 <div className="flex flex-col">
@@ -470,12 +470,12 @@ export const CartCheckoutDialog = ({ cartItems, onSuccess }: CartCheckoutDialogP
                         )}
                     </div>
                 </DialogContent>
-            </Dialog>
-
+            </Dialog> */}
+            {/* 
             <IncompleteProfileDialog
                 open={showIncompleteProfileDialog}
                 onOpenChange={setShowIncompleteProfileDialog}
-            />
+            /> */}
         </>
     );
 };
