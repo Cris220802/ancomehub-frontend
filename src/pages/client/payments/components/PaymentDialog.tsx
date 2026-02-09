@@ -30,14 +30,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/Button";
 import { usePayments } from "../../hooks/usePayments";
 import { UploadCloud, FileText, X } from "lucide-react";
-import { PaymentMethod } from "@/types/orders";
+import { PaymentMethodPayment } from "@/types/payments";
 
 // Schema creator function
 const createPaymentSchema = (maxAmount: number) => z.object({
     amount: z.coerce.number()
         .min(0.01, "El monto debe ser mayor a 0")
         .max(maxAmount, `El monto no puede exceder el saldo pendiente (${new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(maxAmount)})`),
-    method: z.enum(['TRANSFER', 'DEPOSIT', 'CHECK', 'CARD', 'CASH']),
+    method: z.enum(['TRANSFER', 'DEPOSIT', 'CHECK', 'CREDIT', 'CASH']),
     notes: z.string().optional(),
 });
 
@@ -109,7 +109,7 @@ export const PaymentDialog = ({
             await createPayment({
                 orderId,
                 amount: values.amount,
-                method: values.method as PaymentMethod,
+                method: values.method as PaymentMethodPayment,
                 notes: values.notes,
                 file: selectedFile,
             });
@@ -171,7 +171,7 @@ export const PaymentDialog = ({
                                             <SelectItem value="TRANSFER">Transferencia / SPEI</SelectItem>
                                             <SelectItem value="DEPOSIT">Depósito Bancario</SelectItem>
                                             <SelectItem value="CHECK">Cheque</SelectItem>
-                                            <SelectItem value="CARD">Tarjeta</SelectItem>
+                                            <SelectItem value="CREDIT">Tarjeta</SelectItem>
                                             <SelectItem value="CASH">Efectivo</SelectItem>
                                         </SelectContent>
                                     </Select>

@@ -1,4 +1,4 @@
-import { PaymentMethod, UserSummaryDto } from './orders';
+import { UserSummaryDto } from './orders';
 
 export interface OrderSummaryDto {
     id: string;
@@ -12,7 +12,7 @@ export type PaymentMethodPayment = 'CASH' | 'TRANSFER' | 'CREDIT' | 'CHECK' | 'D
 export interface CreatePaymentDto {
     orderId: string;
     amount: number;
-    method: PaymentMethod;
+    method: PaymentMethodPayment;
     notes?: string;
     file: File;
 }
@@ -25,7 +25,7 @@ export interface ReviewPaymentDto {
 export interface Payment {
     id: string;
     amount: number;
-    method: PaymentMethod;
+    method: PaymentMethodPayment;
     status: PaymentStatus;
     notes?: string;
     proofUrl?: string; // Included in response DTO description
