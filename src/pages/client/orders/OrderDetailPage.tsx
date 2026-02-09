@@ -117,7 +117,15 @@ const paymentStatusConfig: Record<OrderPaymentStatus, { label: string; color: st
     },
 };
 
-const paymentMethodLabels: Record<PaymentMethod, string> = {
+const paymentMethodLabels: Record<PaymentMethodPayment, string> = {
+    CASH: 'Efectivo',
+    TRANSFER: 'Transferencia',
+    DEPOSIT: 'Depósito',
+    CHECK: 'Cheque',
+    CREDIT: 'Crédito Ancome'
+};
+
+const paymentMethodOrder: Record<PaymentMethod, string> = {
     CASH_PAYMENT: 'Efectivo',
     CREDIT_PAYMENT: 'Crédito Ancome'
 };
@@ -341,7 +349,7 @@ export const OrderDetailPage = () => {
                                 <div className="space-y-4">
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Método</p>
-                                        <p className="text-sm font-medium text-gray-900">{paymentMethodLabels[order.paymentMethod] || order.paymentMethod}</p>
+                                        <p className="text-sm font-medium text-gray-900">{paymentMethodOrder[order.paymentMethod] || order.paymentMethod}</p>
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 uppercase tracking-wide font-semibold">Estatus</p>
