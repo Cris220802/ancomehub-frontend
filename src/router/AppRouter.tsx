@@ -5,6 +5,8 @@ import { ProtectedRoute } from './ProtectedRoute';
 import { PublicRoute } from './PublicRoute';
 import { LoginPage } from '../pages/auth/LoginPage';
 import { ConfirmInvitationPage } from '../pages/auth/ConfirmInvitationPage';
+import { SendEmailRecoveryPage } from '../pages/auth/SendEmailRecoveryPage';
+import { RecoveryPasswordPage } from '../pages/auth/RecoveryPasswordPage';
 import { DashboardPage } from '../pages/dashboard/DashboardPage';
 
 import { ProductsPage } from '../pages/products/ProductsPage';
@@ -204,7 +206,7 @@ const MainLayout = () => {
                         {/* El componente de notificaciones que pediste */}
                         <NotificationsMenu />
 
-                        <div className="h-8 w-[1px] bg-gray-200 mx-2"></div>
+                        <div className="h-8 w-px bg-gray-200 mx-2"></div>
 
                         <div className="flex items-center gap-2">
                             <div className="text-right hidden sm:block">
@@ -249,6 +251,8 @@ export const AppRouter = () => {
 
                 <Route path="/auth" element={<PublicRoute />}>
                     <Route path="login" element={<LoginPage />} />
+                    <Route path="recovery" element={<SendEmailRecoveryPage />} />
+                    <Route path="recovery-password" element={<RecoveryPasswordPage />} />
                     <Route path="confirm-invitation" element={<ConfirmInvitationPage />} />
                     <Route path="*" element={<Navigate to="/auth/login" replace />} />
                 </Route>

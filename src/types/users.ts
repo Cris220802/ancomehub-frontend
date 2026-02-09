@@ -172,3 +172,13 @@ export interface AgentsFilterDto {
     email?: string;
     status?: UserStatus;
 }
+
+
+export interface SendTokenToRecoveryPasswordDto {
+    email: string;
+}
+
+export interface ResetPasswordDto {
+    token: string;
+    newPassword: string;
+}

@@ -13,6 +13,8 @@ import {
     InviteUserDto,
     PaginatedAgentsResponseDto,
     PaginatedClientsResponseDto,
+    ResetPasswordDto,
+    SendTokenToRecoveryPasswordDto,
     updateClientDataDto,
     UpdateClientProfileDto,
     UpdateUserDto,
@@ -100,5 +102,13 @@ export const UsersService = {
 
     updateClientData: async (id: string, dto: updateClientDataDto): Promise<void> => {
         await api.patch(`/users/clients/update-data/${id}`, dto);
+    },
+
+    sendTokenToRecoveryPassword: async (dto: SendTokenToRecoveryPasswordDto): Promise<void> => {
+        await api.post('/users/recovery-request', dto);
+    },
+
+    resetPassword: async (dto: ResetPasswordDto): Promise<void> => {
+        await api.post('/users/recovery-password', dto);
     },
 };
