@@ -135,6 +135,7 @@ export const OrderDetailPage = () => {
     const navigate = useNavigate();
     const { useOrderDetail, cancelOrder, isCancellingOrder } = useOrders(); // Updated hook usage
     const { data: order, isLoading, isError } = useOrderDetail(id || '');
+    console.log(order);
     // Payments Logic
     const { useOrderPayments } = usePayments();
     const { data: payments } = useOrderPayments(id || '');
@@ -142,6 +143,20 @@ export const OrderDetailPage = () => {
     const [isPaymentDialogOpen, setIsPaymentDialogOpen] = React.useState(false);
     const [isCancelDialogOpen, setIsCancelDialogOpen] = React.useState(false);
     const [isTimeErrorDialogOpen, setIsTimeErrorDialogOpen] = React.useState(false);
+
+    // Parse shippingInfo safely
+    const shippingInfo = React.useMemo(() => {
+        if (!order?.shippingInfo) return null;
+        if (typeof order.shippingInfo === 'string') {
+            try {
+                return JSON.parse(order.shippingInfo);
+            } catch (e) {
+                console.error("Error parsing shippingInfo:", e);
+                return null;
+            }
+        }
+        return order.shippingInfo;
+    }, [order?.shippingInfo]);
 
     const handleConfirmCancel = async () => {
         try {
@@ -201,19 +216,7 @@ export const OrderDetailPage = () => {
     // Asumimos que el ID de la factura es el del primer documento si existe
     const invoiceId = hasInvoice ? order.fiscalDocuments![0].id : null;
 
-    // Parse shippingInfo safely
-    const shippingInfo = React.useMemo(() => {
-        if (!order?.shippingInfo) return null;
-        if (typeof order.shippingInfo === 'string') {
-            try {
-                return JSON.parse(order.shippingInfo);
-            } catch (e) {
-                console.error("Error parsing shippingInfo:", e);
-                return null;
-            }
-        }
-        return order.shippingInfo;
-    }, [order?.shippingInfo]);
+
 
     return (
         <div className="min-h-screen bg-gray-50/50 pb-12 animate-in fade-in duration-500">
