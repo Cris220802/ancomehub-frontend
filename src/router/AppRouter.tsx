@@ -326,10 +326,10 @@ export const AppRouter = () => {
 
                 </Route>
 
-                <Route path="/catalog" element={<PublicCatalogPage />} />
-                <Route path="/catalog/:agentId" element={<PublicCatalogPage />} />
+                <Route path="/catalogo" element={<PublicCatalogPage />} />
+                <Route path="/catalogo/:agentId" element={<PublicCatalogPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                <Route path="*" element={<Navigate to="/catalog" replace />} />
+                <Route path="*" element={<Navigate to="/catalogo" replace />} />
             </Routes>
         </>
     );
