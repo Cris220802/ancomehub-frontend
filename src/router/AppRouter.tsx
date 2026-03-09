@@ -22,7 +22,12 @@ import {
     Tags,
     LogOut,
     ShoppingBag,
-    DockIcon
+    DockIcon,
+    BanknoteArrowUp,
+    Contact,
+    FileText,
+    Warehouse,
+    BadgePercent
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { ClientLayout } from '@/layouts/ClientLayout';
@@ -53,6 +58,10 @@ import { ProfilePage } from '@/pages/client/profile/ProfilePage';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { CatalogPage as PublicCatalogPage } from '@/pages/public/CatalogPage';
 import { NotificationsMenu } from '@/components/layout/NotificationsMenu';
+import { NotesPage } from '@/pages/admin/notes/NotesPage';
+import { NoteDetailPage } from '@/pages/admin/notes/NoteDetailPage';
+import { WeakClientsPage } from '@/pages/admin/notes/clients/WeakClientsPage';
+import { WeakClientDetailPage } from '@/pages/admin/notes/clients/WeakClientDetailPage';
 
 const MainLayout = () => {
     const { logout, user } = useAuthStore();
@@ -105,7 +114,7 @@ const MainLayout = () => {
                             }`
                         }
                     >
-                        <Users className="h-5 w-5" />
+                        <Contact className="h-5 w-5" />
                         Vendedores
                     </NavLink>
                     <NavLink
@@ -121,6 +130,18 @@ const MainLayout = () => {
                         Pedidos
                     </NavLink>
                     <NavLink
+                        to="/admin/notes"
+                        className={({ isActive }) =>
+                            `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                                ? 'bg-primary/10 text-primary font-medium'
+                                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                            }`
+                        }
+                    >
+                        <BanknoteArrowUp className="h-5 w-5" />
+                        Notas de Crédito
+                    </NavLink>
+                    <NavLink
                         to="/admin/fiscal"
                         className={({ isActive }) =>
                             `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
@@ -129,7 +150,7 @@ const MainLayout = () => {
                             }`
                         }
                     >
-                        <DockIcon className="h-5 w-5" />
+                        <FileText className="h-5 w-5" />
                         Facturas
                     </NavLink>
                     <NavLink
@@ -141,7 +162,7 @@ const MainLayout = () => {
                             }`
                         }
                     >
-                        <Tags className="h-5 w-5" />
+                        <BadgePercent className="h-5 w-5" />
                         Listas de precios
                     </NavLink>
                     <NavLink
@@ -153,7 +174,7 @@ const MainLayout = () => {
                             }`
                         }
                     >
-                        <DockIcon className="h-5 w-5" />
+                        <Warehouse className="h-5 w-5" />
                         Almacén
                     </NavLink>
                     <NavLink
@@ -277,6 +298,10 @@ export const AppRouter = () => {
                                 <Route path="admin/categories" element={<CategoriesPage />} />
                                 <Route path="admin/orders" element={<AdminOrdersPage />} />
                                 <Route path="admin/orders/:id" element={<AdminOrderDetailPage />} />
+                                <Route path="admin/notes" element={<NotesPage />} />
+                                <Route path="admin/notes/:id" element={<NoteDetailPage />} />
+                                <Route path="admin/notes/clients" element={<WeakClientsPage />} />
+                                <Route path="admin/notes/clients/:id" element={<WeakClientDetailPage />} />
                                 <Route path="admin/orders/quotes/:id" element={<QuoteAdminDetailPage />} />
                                 <Route path="admin/fiscal" element={<FiscalAdminPage />} />
                                 <Route path="admin/fiscal/:id" element={<FiscalAdminDetailPage />} />
