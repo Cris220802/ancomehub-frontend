@@ -2,59 +2,68 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import {
     ArrowRight,
-    Truck,
-    ShieldCheck,
     Cpu,
     Code2,
     Zap,
     ChevronRight,
-    ChevronLeft
+    ChevronLeft,
+    FileText,
+    ClipboardList,
+    LayoutDashboard,
+    Layers,
+    Share2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const BANNERS = [
     {
-        id: "ancome-safety",
-        brand: "Ancome",
-        badge: "Oferta Especial",
-        title: <>Seguridad Industrial <br /><span className="text-yellow-500">al Mejor Precio</span></>,
-        description: "Equipa a tu personal minero e industrial con lo último en protección. Envío gratis en pedidos superiores a $5,000 MXN.",
-        theme: "yellow", // Para estilos condicionales
+        id: "ancome-hub-management",
+        brand: "Ancome Hub",
+        badge: "Portal del Cliente",
+        title: <>Toma el Control de <br /><span className="text-yellow-500">tus Operaciones</span></>,
+        description: "Gestiona cotizaciones en tiempo real, descarga tus facturas y consulta complementos de pago al instante desde tu panel.",
+        theme: "yellow",
         bgGradient: "from-slate-900 to-slate-800",
+        hasButton: false,
         accentColor: "text-yellow-500",
         buttonColor: "bg-yellow-500 hover:bg-yellow-400 text-slate-900",
         features: [
-            { icon: Truck, text: "Envío Rápido" },
-            { icon: ShieldCheck, text: "Norma Oficial" }
+            { icon: FileText, text: "Facturación 24/7" },
+            { icon: ClipboardList, text: "Historial de Cotizaciones" }
         ],
         visual: {
-            title: "Kit Minero Pro",
-            subtitle: "Casco, Lámpara y Guantes",
-            tag: "-15% OFF",
-            tagColor: "bg-green-500/20 text-green-400",
-            icon: ShieldCheck // Icono visual si no hay imagen
+            title: "Gestión Digital",
+            subtitle: "Documentos y Pagos",
+            tag: "Acceso Pro",
+            tagColor: "bg-blue-500/20 text-blue-400",
+            icon: LayoutDashboard
         }
     },
     {
-        id: "ancome-soluciones",
+        id: "ancome-soluciones-strat",
         brand: "Ancome Soluciones",
-        badge: "Nueva División",
-        title: <>Transformación Digital <br /><span className="text-blue-400">Software & IA</span></>,
-        description: "Desarrollamos el software a la medida que tu empresa necesita. Automatización, ERPs personalizados y Consultoría en IA.",
+        badge: "Consultoría e Implementación",
+        title: <>Evolución Digital <br /><span className="text-blue-400">Inteligente y Escalable</span></>,
+        description: "Integramos ecosistemas digitales y modelos de IA que transforman datos en decisiones. Soluciones robustas para desafíos complejos.",
         theme: "blue",
-        bgGradient: "from-slate-900 via-slate-800 to-blue-950",
+        bgGradient: "from-slate-900 to-blue-950",
+        hasButton: true,
+        onClick: () => {
+            // redirigir a pagina web
+            window.open("https://www.ancomesoluciones.com", "_blank");
+        },
         accentColor: "text-blue-400",
         buttonColor: "bg-blue-500 hover:bg-blue-400 text-white",
         features: [
-            { icon: Code2, text: "Desarrollo a Medida" },
-            { icon: Cpu, text: "Inteligencia Artificial" }
+            { icon: Layers, text: "Integración de Sistemas" },
+            { icon: Cpu, text: "Modelos de IA" }
         ],
         visual: {
-            title: "Consultoría IT",
-            subtitle: "Diagnóstico Gratuito",
-            tag: "NUEVO",
-            tagColor: "bg-blue-500/20 text-blue-300",
-            icon: Zap
+            title: "Ecosistema Digital",
+            subtitle: "Liderazgo Tecnológico",
+            tag: "SOLUCIONES",
+            tagColor: "bg-cyan-500/20 text-cyan-300",
+            icon: Share2
         }
     }
 ];
@@ -128,10 +137,12 @@ export function PromotionalBanner() {
                     </p>
 
                     <div className="flex flex-wrap gap-4 pt-2">
-                        <Button className={cn("font-semibold border-none transition-all hover:scale-105", banner.buttonColor)}>
-                            {banner.theme === 'yellow' ? 'Ver Catálogo' : 'Cotizar Proyecto'}
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
+                        {banner.hasButton && (
+                            <Button onClick={banner.onClick} className={cn("font-semibold border-none transition-all hover:scale-105", banner.buttonColor)}>
+                                {banner.theme === 'yellow' ? 'Ver Catálogo' : 'Saber Más'}
+                                <ArrowRight className="ml-2 h-4 w-4" />
+                            </Button>
+                        )}
                         <div className="flex gap-4 text-sm text-slate-400 items-center">
                             {banner.features.map((feature, idx) => (
                                 <span key={idx} className="flex items-center gap-1.5">
@@ -144,30 +155,7 @@ export function PromotionalBanner() {
                 </div>
 
                 {/* Elemento Visual / Tarjeta 3D */}
-                <div className="hidden md:flex justify-end relative z-10">
-                    {/* Efecto Glow de Fondo */}
-                    <div className={cn(
-                        "absolute inset-0 blur-3xl rounded-full translate-x-10 translate-y-10 opacity-40 transition-colors duration-700",
-                        banner.theme === 'yellow' ? "bg-yellow-500/20" : "bg-blue-500/30"
-                    )}></div>
 
-                    <div className="relative p-6 bg-white/5 backdrop-blur-md rounded-xl border border-white/10 w-full max-w-sm shadow-2xl hover:bg-white/10 transition-colors duration-300">
-                        <div className="flex items-start justify-between mb-4">
-                            <div>
-                                <h3 className="font-semibold text-lg text-white">{banner.visual.title}</h3>
-                                <p className="text-slate-400 text-xs">{banner.visual.subtitle}</p>
-                            </div>
-                            <span className={cn("px-2 py-1 text-[10px] rounded font-bold tracking-wider", banner.visual.tagColor)}>
-                                {banner.visual.tag}
-                            </span>
-                        </div>
-
-                        {/* Placeholder de Imagen o Icono Gigante */}
-                        <div className="h-32 bg-slate-800/50 rounded-lg border border-white/5 flex items-center justify-center group-hover:scale-[1.02] transition-transform duration-500">
-                            <VisualIcon className={cn("h-16 w-16 opacity-50", banner.accentColor)} />
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Controles de Navegación (Flechas) */}
