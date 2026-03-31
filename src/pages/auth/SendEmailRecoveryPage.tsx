@@ -45,7 +45,7 @@ export const SendEmailRecoveryPage = () => {
                         Recuperar <span className="text-primary">Cuenta</span>
                     </h1>
                     <p className="text-lg text-gray-300 max-w-sm font-light">
-                        Te ayudaremos a restablecer tu contraseña para que puedas volver a gestionar tu negocio.
+                        Te ayudaremos a restablecer tu contraseña para que puedas volver a gestionar tus cotizaciones y facturas.
                     </p>
                 </div>
             </div>

@@ -53,7 +53,7 @@ export const LoginPage = () => {
                         Ancome<span className="text-primary">Hub</span>
                     </h1>
                     <p className="text-lg text-gray-300 max-w-sm font-light">
-                        Gestión integral y control total para tu negocio B2B.
+                        Cotiza al instante, gestiona tus facturas y complementos de pago, todo en un solo lugar.
                     </p>
                 </div>
             </div>
