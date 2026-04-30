@@ -11,32 +11,49 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/Input';
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     Warehouse,
     Plus,
     ArrowRightLeft,
     MapPin,
     Search,
+    Loader2,
 } from 'lucide-react';
 import { useWarehouses } from '@/pages/admin/hooks/useAdminWarehouse';
+import { useCategories } from '@/pages/categories/hooks/useCategories';
 import { CreateWarehouseDialog } from './components/CreateWarehouseDialog';
 import { MovementDialog } from './components/MovementDialog';
 import { DataTable } from "@/components/ui/data-table";
+import { CustomPagination } from '@/components/common/CustomPagination';
 import { getColumns } from './components/columns';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useDebounce } from '@/hooks/useDebounce';
+import { InventoryFilters } from '@/types/warehouse';
+
+const DEFAULT_FILTERS: InventoryFilters = { page: 1, limit: 10 };
 
 export const WarehousePage = () => {
     const { useGetWarehouses, useGetInventory } = useWarehouses();
+    const { categories } = useCategories();
 
     // Estados
     const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | null>(null);
-    const [inventorySearch, setInventorySearch] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filters, setFilters] = useState<InventoryFilters>(DEFAULT_FILTERS);
     const [createDialogOpen, setCreateDialogOpen] = useState(false);
     const [movementDialogOpen, setMovementDialogOpen] = useState(false);
 
+    const debouncedSearch = useDebounce(searchTerm, 500);
+
     // Queries
     const warehousesQuery = useGetWarehouses();
-    const inventoryQuery = useGetInventory(selectedWarehouseId);
+    const inventoryQuery = useGetInventory(selectedWarehouseId, filters);
 
     // Generar las columnas dinámicamente
     const columns = useMemo(() => {
@@ -51,11 +68,32 @@ export const WarehousePage = () => {
         }
     }, [warehousesQuery.data, selectedWarehouseId]);
 
-    // Filtrado de inventario
-    const filteredInventory = inventoryQuery.data?.filter(stock =>
-        stock.product.name.toLowerCase().includes(inventorySearch.toLowerCase()) ||
-        stock.product.sku.toLowerCase().includes(inventorySearch.toLowerCase())
-    ) || [];
+    // Sincronizar búsqueda debounced con filtros (resetea a página 1)
+    useEffect(() => {
+        setFilters(prev => ({
+            ...prev,
+            productName: debouncedSearch || undefined,
+            page: 1,
+        }));
+    }, [debouncedSearch]);
+
+    // Resetear filtros y búsqueda al cambiar de almacén
+    useEffect(() => {
+        setSearchTerm('');
+        setFilters(DEFAULT_FILTERS);
+    }, [selectedWarehouseId]);
+
+    const handleCategoryChange = (value: string) => {
+        setFilters(prev => ({
+            ...prev,
+            categoryId: value === 'all' ? undefined : value,
+            page: 1,
+        }));
+    };
+
+    const handlePageChange = (page: number) => {
+        setFilters(prev => ({ ...prev, page }));
+    };
 
     if (warehousesQuery.isLoading) {
         return (
@@ -138,28 +176,59 @@ export const WarehousePage = () => {
                 <div className="lg:col-span-9 space-y-6">
                     <Card className="border-none shadow-md bg-white">
                         <CardHeader className="border-b bg-gray-50/50 pb-4">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div>
-                                    <CardTitle>Inventario Actual</CardTitle>
-                                    <CardDescription>
-                                        Stock disponible en <span className="font-medium text-gray-900">
-                                            {warehousesQuery.data?.find(w => w.id === selectedWarehouseId)?.name || 'Selecciona un almacén'}
-                                        </span>
-                                    </CardDescription>
+                            <div className="flex flex-col gap-4">
+                                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                    <div>
+                                        <CardTitle>Inventario Actual</CardTitle>
+                                        <CardDescription>
+                                            Stock disponible en <span className="font-medium text-gray-900">
+                                                {warehousesQuery.data?.find(w => w.id === selectedWarehouseId)?.name || 'Selecciona un almacén'}
+                                            </span>
+                                        </CardDescription>
+                                    </div>
+                                    {inventoryQuery.isFetching && (
+                                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                                    )}
                                 </div>
-                                <div className="relative w-full sm:w-64">
-                                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        placeholder="Buscar producto o SKU..."
-                                        className="pl-9 bg-white"
-                                        value={inventorySearch}
-                                        onChange={(e) => setInventorySearch(e.target.value)}
-                                    />
+
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <div className="relative w-full sm:flex-1">
+                                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+                                        <Input
+                                            placeholder="Buscar producto por nombre..."
+                                            className="pl-9 bg-white"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
+                                    <Select
+                                        value={filters.categoryId || 'all'}
+                                        onValueChange={handleCategoryChange}
+                                    >
+                                        <SelectTrigger className="w-full sm:w-[220px] bg-white">
+                                            <SelectValue placeholder="Todas las categorías" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Todas las categorías</SelectItem>
+                                            {categories.map((category) => (
+                                                <SelectItem key={category.id} value={category.id}>
+                                                    {category.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                         </CardHeader>
                         <CardContent className="p-0">
-                            <DataTable columns={columns} data={filteredInventory} />
+                            <DataTable columns={columns} data={inventoryQuery.data?.items || []} />
+                            <div className="px-4">
+                                <CustomPagination
+                                    meta={inventoryQuery.data?.meta}
+                                    onPageChange={handlePageChange}
+                                    isLoading={inventoryQuery.isFetching}
+                                />
+                            </div>
                         </CardContent>
                     </Card>
                 </div>

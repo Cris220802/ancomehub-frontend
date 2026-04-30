@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { warehouseService } from '@/services/warehouse.service';
-import { CreateMovementDto, CreateWarehouseDto } from '@/types/warehouse';
+import { CreateMovementDto, CreateWarehouseDto, InventoryFilters } from '@/types/warehouse';
 import { toast } from 'sonner';
 
 export const useWarehouses = () => {
@@ -17,10 +17,10 @@ export const useWarehouses = () => {
         });
     };
 
-    const useGetInventory = (warehouseId: string | null) => {
+    const useGetInventory = (warehouseId: string | null, filters?: InventoryFilters) => {
         return useQuery({
-            queryKey: ['warehouse-inventory', warehouseId],
-            queryFn: () => warehouseService.getInventory(warehouseId!),
+            queryKey: ['warehouse-inventory', warehouseId, filters],
+            queryFn: () => warehouseService.getInventory(warehouseId!, filters),
             enabled: !!warehouseId, // Solo ejecuta si hay ID
         });
     };

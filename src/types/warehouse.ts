@@ -71,3 +71,19 @@ export interface WarehouseStock {
         stock: number; // Stock global
     };
 }
+
+export interface InventoryFilters {
+    page?: number;
+    limit?: number;
+    categoryId?: string;
+    productName?: string;
+}
+
+export interface PaginatedInventoryResponse {
+    items: WarehouseStock[];
+    meta: {
+        total: number;
+        page: number;
+        lastPage: number;
+    };
+}

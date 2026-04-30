@@ -4,7 +4,8 @@ import {
     CreateWarehouseDto,
     CreateMovementDto,
     Movement,
-    WarehouseStock
+    InventoryFilters,
+    PaginatedInventoryResponse
 } from '@/types/warehouse';
 
 export const warehouseService = {
@@ -26,9 +27,15 @@ export const warehouseService = {
         return data;
     },
 
-    // Obtener inventario de un almacén específico
-    getInventory: async (warehouseId: string): Promise<WarehouseStock[]> => {
-        const { data } = await api.get<WarehouseStock[]>(`/warehouses/${warehouseId}/inventory`);
+    // Obtener inventario de un almacén específico (paginado y filtrado)
+    getInventory: async (
+        warehouseId: string,
+        filters?: InventoryFilters
+    ): Promise<PaginatedInventoryResponse> => {
+        const { data } = await api.get<PaginatedInventoryResponse>(
+            `/warehouses/${warehouseId}/inventory`,
+            { params: filters }
+        );
         return data;
     },
 

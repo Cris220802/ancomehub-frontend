@@ -71,6 +71,10 @@ export const QuotesPage = () => {
         setFilters(prev => ({ ...prev, [key]: value, page: 1 }));
     };
 
+    const handlePageChange = (page: number) => {
+        setFilters(prev => ({ ...prev, page }));
+    };
+
     const clearFilters = () => {
         setFilters({ page: 1, limit: 10, folio: '', status: undefined, dateFrom: '', dateTo: '' });
         setFolioInput('');
@@ -223,7 +227,7 @@ export const QuotesPage = () => {
                             <PaginationContent>
                                 <PaginationItem>
                                     <PaginationPrevious
-                                        onClick={() => handleFilterChange('page', Math.max(1, (meta.page || 1) - 1))}
+                                        onClick={() => handlePageChange(Math.max(1, (meta.page || 1) - 1))}
                                         className={cn(
                                             "cursor-pointer",
                                             meta.page === 1 || isTableLoading ? "pointer-events-none opacity-50" : ""
@@ -239,7 +243,7 @@ export const QuotesPage = () => {
 
                                 <PaginationItem>
                                     <PaginationNext
-                                        onClick={() => handleFilterChange('page', Math.min(meta.lastPage, (meta.page || 1) + 1))}
+                                        onClick={() => handlePageChange(Math.min(meta.lastPage, (meta.page || 1) + 1))}
                                         className={cn(
                                             "cursor-pointer",
                                             meta.page === meta.lastPage || isTableLoading ? "pointer-events-none opacity-50" : ""

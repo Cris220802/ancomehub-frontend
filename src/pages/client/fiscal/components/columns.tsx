@@ -86,12 +86,12 @@ export const columns: ColumnDef<FiscalDocument>[] = [
             return (
                 <div className="flex justify-end gap-2">
                     {/* Descarga rápida si hay PDF */}
-                    {doc.pdfUrl && (
+                    {/* {doc.pdfUrl && (
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-red-500" onClick={() => window.open(doc.pdfUrl, '_blank')}>
                             <FileText className="h-4 w-4" />
                             <span className="sr-only">PDF</span>
                         </Button>
-                    )}
+                    )} */}
 
                     <Link to={`/fiscal/${doc.id}`}>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-primary">

@@ -93,6 +93,20 @@ export const OrderDetailPage = () => {
     const registerShipmentMutation = useRegisterShipment();
     const fulfillBackordersMutation = useFulfillBackorders();
 
+    // Parse shippingInfo safely (debe ir antes de cualquier early return para no romper Rules of Hooks)
+    const shippingInfo = useMemo(() => {
+        if (!order?.shippingInfo) return null;
+        if (typeof order.shippingInfo === 'string') {
+            try {
+                return JSON.parse(order.shippingInfo);
+            } catch (e) {
+                console.error("Error parsing shippingInfo:", e);
+                return null;
+            }
+        }
+        return order.shippingInfo;
+    }, [order?.shippingInfo]);
+
     if (loadingOrder || loadingPayments) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-gray-50/50">
@@ -125,20 +139,6 @@ export const OrderDetailPage = () => {
 
     // Un pedido es "entregable" si está confirmado o parcial Y tiene ítems apartados
     const isDeliverable = (order.status === 'CONFIRMED' || order.status === 'PARTIALLY_DELIVERED') && hasAllocated;
-
-    // Parse shippingInfo safely
-    const shippingInfo = useMemo(() => {
-        if (!order?.shippingInfo) return null;
-        if (typeof order.shippingInfo === 'string') {
-            try {
-                return JSON.parse(order.shippingInfo);
-            } catch (e) {
-                console.error("Error parsing shippingInfo:", e);
-                return null;
-            }
-        }
-        return order.shippingInfo;
-    }, [order?.shippingInfo]);
 
     const handleCancelOrder = () => {
         if (!id) return;

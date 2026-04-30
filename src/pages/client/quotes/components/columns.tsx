@@ -65,10 +65,6 @@ export const columns: ColumnDef<Order>[] = [
         id: "actions",
         cell: ({ row }) => (
             <div className="flex justify-end gap-2">
-                <Button variant="outline" size="icon" className="h-8 w-8 text-gray-500 hover:text-primary pt-0.5">
-                    <FileText className="h-4 w-4" />
-                    <span className="sr-only">Ver PDF</span>
-                </Button>
                 <Link to={`/quotes/${row.original.id}`}>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-500 hover:text-primary">
                         <Eye className="h-4 w-4" />
